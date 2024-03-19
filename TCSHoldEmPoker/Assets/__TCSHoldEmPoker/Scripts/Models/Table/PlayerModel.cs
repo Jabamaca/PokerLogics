@@ -49,6 +49,13 @@ namespace TCSHoldEmPoker.Models {
             _chipsInHand = 0;
         }
 
+        public PlayerStateData ConvertToStateData () {
+            return new PlayerStateData {
+                playerID = _playerID,
+                chipsInHand = _chipsInHand,
+            };
+        }
+
         #endregion
 
     }

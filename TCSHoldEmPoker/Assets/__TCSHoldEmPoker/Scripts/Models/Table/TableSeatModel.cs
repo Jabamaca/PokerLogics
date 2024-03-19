@@ -46,13 +46,6 @@ namespace TCSHoldEmPoker.Models {
 
         #region Methods
 
-        public void GiveChips (int chipsWon) {
-            if (IsSeatEmpty)
-                return;
-
-            _seatedPlayer.GainChips (chipsWon);
-        }
-
         #region Playing Methods
 
         public bool SeatPlayer (PlayerModel player) {
@@ -87,6 +80,13 @@ namespace TCSHoldEmPoker.Models {
         public void SetReadyForAnte () {
             _didCheck = false;
             _isPlaying = true;
+        }
+
+        public void GiveChips (int chipsWon) {
+            if (IsSeatEmpty)
+                return;
+
+            _seatedPlayer.GainChips (chipsWon);
         }
 
         #endregion
@@ -145,6 +145,20 @@ namespace TCSHoldEmPoker.Models {
             _didCheck = false;
             _currentWager = 0;
             return collectedChips;
+        }
+
+        #endregion
+
+        #region State Data Methods
+
+        public SeatStateData ConvertToStateData () {
+            PlayerStateData psd = _seatedPlayer?.ConvertToStateData ();
+            return new SeatStateData {
+                seatedPlayerStateData = psd,
+                didCheck = _didCheck,
+                isPlaying = _isPlaying,
+                currentWager = _currentWager,
+            };
         }
 
         #endregion
