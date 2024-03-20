@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
@@ -16,7 +17,7 @@ namespace TCSHoldEmPoker.Models {
         public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
         public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
 
-        // Wagering Delegates
+        // Player Action Delegates
         public delegate void DidPlayerBetBlindHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetCheckHandler (int gameTableID, int playerID);
         public delegate void DidPlayerBetCallHandler (int gameTableID, int playerID, int chipsSpent);
@@ -42,7 +43,7 @@ namespace TCSHoldEmPoker.Models {
         public DidDealCardsToPlayersHandler DidDealCardsToPlayers = delegate { };
         public DidDealCommunityCardHandler DidDealCommunityCard = delegate { };
 
-        // Wagering Delegates
+        // Player Action Delegates
         public DidPlayerBetBlindHandler DidPlayerBetBlind = delegate { };
         public DidPlayerBetCheckHandler DidPlayerBetCheck = delegate { };
         public DidPlayerBetCallHandler DidPlayerBetCall = delegate { };
@@ -459,40 +460,30 @@ namespace TCSHoldEmPoker.Models {
             if (CurrentTurningSeat.SeatedPlayerID != playerID)
                 return; // Not playerID's turn.
 
-            if (FindSeatWithPlayerID (playerID, out var turningSeat)) {
-                if (!turningSeat.IsPlaying)
-                    return; // Folded or waiting player can't interact.
+            TryPlayerAction (playerID, (seat) => {
+                if (_currentTableStake == 0 || seat.SeatedPlayerChips == 0) {
+                    seat.DoCheck ();
+                    DidPlayerBetCheck?.Invoke (_gameTableID, seat.SeatedPlayerID);
 
-                if (_currentTableStake == 0 || turningSeat.SeatedPlayerChips == 0) {
-                    turningSeat.DoCheck ();
-                    DidPlayerBetCheck?.Invoke (_gameTableID, turningSeat.SeatedPlayerID);
-
-                } else if (_currentTableStake >= turningSeat.SeatedPlayerChips) {
-                    turningSeat.WagerAllIn (out int chipsSpent);
-                    DidPlayerBetAllIn?.Invoke (_gameTableID, turningSeat.SeatedPlayerID, chipsSpent);
+                } else if (_currentTableStake >= seat.SeatedPlayerChips) {
+                    seat.WagerAllIn (out int chipsSpent);
+                    DidPlayerBetAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
 
                 } else {
-                    turningSeat.RaiseWagerTo (_currentTableStake, out int chipsSpent);
-                    DidPlayerBetCall?.Invoke (_gameTableID, turningSeat.SeatedPlayerID, chipsSpent);
+                    seat.RaiseWagerTo (_currentTableStake, out int chipsSpent);
+                    DidPlayerBetCall?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
                 }
-
-                CheckAllWagerChecks ();
-            }
+            });
         }
 
         public void PlayerFold (int playerID) {
             if (CurrentTurningSeat.SeatedPlayerID != playerID)
                 return; // Not playerID's turn.
 
-            if (FindSeatWithPlayerID (playerID, out var turningSeat)) {
-                if (!turningSeat.IsPlaying)
-                    return; // Folded or waiting player can't interact.
-
-                turningSeat.FoldHand ();
-                DidPlayerFold.Invoke (_gameTableID, turningSeat.SeatedPlayerID);
-
-                CheckAllWagerChecks ();
-            }
+            TryPlayerAction (playerID, (seat) => {
+                seat.FoldHand ();
+                DidPlayerFold.Invoke (_gameTableID, seat.SeatedPlayerID);
+            });
         }
 
         public void PlayerRaise (int playerID, int newStake) {
@@ -502,15 +493,26 @@ namespace TCSHoldEmPoker.Models {
             if (newStake <= _currentTableStake)
                 return; // Invalid Raise.
 
-            if (FindSeatWithPlayerID (playerID, out var turningSeat)) {
-                if (!turningSeat.IsPlaying)
-                    return; // Folded or waiting player can't interact.
-
+            TryPlayerAction (playerID, (seat) => {
                 RemoveAllChecks ();
 
-                turningSeat.RaiseWagerTo (newStake, out int spentChips);
-                DidPlayerBetRaise?.Invoke (_gameTableID, turningSeat.SeatedPlayerID, spentChips);
+                if (newStake >= seat.SeatedPlayerChips) {
+                    seat.WagerAllIn (out int chipsSpent);
+                    DidPlayerBetAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
+                } else {
+                    seat.RaiseWagerTo (newStake, out int chipsSpent);
+                    DidPlayerBetRaise?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
+                }
                 _currentTableStake = newStake;
+            });
+        }
+
+        private void TryPlayerAction (int playerID, Action<TableSeatModel> action) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                if (!seat.IsPlaying)
+                    return; // Folded or waiting player can't interact.
+
+                action (seat);
 
                 CheckAllWagerChecks ();
             }
