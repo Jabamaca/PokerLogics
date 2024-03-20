@@ -16,7 +16,7 @@ namespace TCSHoldEmPoker.Models {
         #region Constructors
 
         public PlayerModel (int playerID, int buyInChips) {
-            _playerID = -playerID;
+            _playerID = playerID;
             _chipsInHand = buyInChips;
         }
 
@@ -29,12 +29,13 @@ namespace TCSHoldEmPoker.Models {
 
         #region Methods
 
-        public void SpendChips (int chips) {
+        public void SpendChips (int chips, out int spentChips) {
             if (chips >= _chipsInHand) {
-                SpendAllChips ();
+                SpendAllChips (out spentChips);
                 return;
             }
 
+            spentChips = chips;
             _chipsInHand -= chips;
         }
 
@@ -45,7 +46,8 @@ namespace TCSHoldEmPoker.Models {
             _chipsInHand += chips;
         }
 
-        public void SpendAllChips () {
+        public void SpendAllChips (out int spentChips) {
+            spentChips = _chipsInHand;
             _chipsInHand = 0;
         }
 
