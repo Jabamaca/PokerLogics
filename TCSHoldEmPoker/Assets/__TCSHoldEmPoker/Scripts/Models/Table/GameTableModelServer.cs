@@ -1,51 +1,54 @@
 using System.Collections.Generic;
-using TCSHoldEmPoker.Defines;
 using TCSHoldEmPoker.Models.Define;
-using Unity.IO.LowLevel.Unsafe;
-using UnityEditor;
 
 namespace TCSHoldEmPoker.Models {
-    public class GameTableModelServer {
+    public class GameTableModelServer : GameTableModel {
 
-        private const int TABLE_CAPACITY = HoldEmPokerDefines.POKER_TABLE_CAPACITY;
-        private const int CARD_DEAL_COUNT = HoldEmPokerDefines.HOLDEM_POKER_DEAL_COUNT;
-        private const int COMMUNITY_CARD_COUNT = HoldEmPokerDefines.COMMUNITY_CARD_COUNT;
+        public delegate void DidGamePhaseChangeHandler (PokerGamePhase phase, int gameTableID);
 
         #region Properties
 
-        private readonly int _minimumWager;
-        public int MinimumWager => _minimumWager;
-        private int SmallBlindWager => _minimumWager / 2;
+        public DidGamePhaseChangeHandler DidGamePhaseChange = delegate { };
 
+        // Wagering Properties
+        private int SmallBlindWager => MinimumWager / 2;
+
+        // Turning Properties
         private int _nextDealerIndex = 0; // Determines Small Blind for next Ante.
         private int _currentDealerIndex = 0; // Determines Small Blind for current Ante.
-        private int _currentTurnPlayerIndex = 0;
-
-        private readonly TableSeatModel[] _playerSeats = new TableSeatModel[TABLE_CAPACITY];
-        private TableSeatModel CurrentTurningSeat => _playerSeats[_currentTurnPlayerIndex];
-
-        private PokerGamePhase _currentGamePhase = PokerGamePhase.WAITING;
 
         private readonly CardDeck _deck = new ();
-        private int _currentTableStake = 0;
-        private int _cashPot = 0;
-        private readonly PokerCard[] _communityCards = new PokerCard[COMMUNITY_CARD_COUNT];
 
         #endregion
 
         #region Constructor
 
         public GameTableModelServer (int minWager) {
+            _gameTableID = GenerateGameTableID ();
+
+            _minimumWager = minWager;
+            _currentTableStake = 0;
+            _cashPot = 0;
+
+            _currentTurnPlayerIndex = 0;
             for (int i = 0; i < TABLE_CAPACITY; i++) {
                 _playerSeats[i] = new ();
             }
 
-            _minimumWager = minWager;
+            _currentGamePhase = PokerGamePhase.WAITING;
+            for (int i = 0; i < COMMUNITY_CARD_COUNT; i++) {
+                _communityCards[i] = PokerCard.BLANK;
+            }
         }
 
         #endregion
 
         #region Methods
+
+        private static int GenerateGameTableID () {
+            // TODO: How to generate Table ID???
+            return 123456;
+        }
 
         #region Player Query Methods
 
@@ -70,18 +73,6 @@ namespace TCSHoldEmPoker.Models {
             }
 
             return playerCount == 1;
-        }
-
-        private bool FindSeatWithPlayerID (int playerID, out TableSeatModel seat) {
-            for (int i = 0; i < TABLE_CAPACITY; i++) {
-                if (_playerSeats[i].SeatedPlayerID == playerID) {
-                    seat = _playerSeats[i];
-                    return true;
-                }
-            }
-
-            seat = null;
-            return false;
         }
 
         private int GetSeatedPlayerCount () {
@@ -207,10 +198,8 @@ namespace TCSHoldEmPoker.Models {
 
         private void RevealTheFlop () {
             _currentGamePhase = PokerGamePhase.THE_FLOP;
-
             DealTheFlopCards ();
 
-            GatherWagersToPot ();
             // Next turning player is the player immediately after the Dealer.
             _currentTurnPlayerIndex = _currentDealerIndex;
             ProceedPlayerTurn ();
@@ -225,10 +214,8 @@ namespace TCSHoldEmPoker.Models {
 
         private void RevealTheTurn () {
             _currentGamePhase = PokerGamePhase.THE_TURN;
-
             DealTheTurnCards ();
 
-            GatherWagersToPot ();
             ProceedPlayerTurn ();
         }
 
@@ -239,10 +226,8 @@ namespace TCSHoldEmPoker.Models {
 
         private void RevealTheRiver () {
             _currentGamePhase = PokerGamePhase.THE_RIVER;
-
             DealTheRiverCards ();
 
-            GatherWagersToPot ();
             ProceedPlayerTurn ();
         }
 
@@ -296,6 +281,8 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void WinByDefault (int playerID) {
+            GatherWagersToPot ();
+
             _currentGamePhase = PokerGamePhase.GAME_END;
 
             if (FindSeatWithPlayerID (playerID, out var seat)) {
@@ -342,6 +329,8 @@ namespace TCSHoldEmPoker.Models {
             if (!allChecked) {
                 ProceedPlayerTurn ();
             } else {
+                GatherWagersToPot ();
+
                 if (playersWithChips <= 1) { // Max betting reached.
                     AllInShowdown ();
                     return;
