@@ -6,8 +6,9 @@ namespace TCSHoldEmPoker.Models {
 
         public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
         public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
-        public delegate void DidRevealAllHandsHandler (int gameTableID, Dictionary<int, IReadOnlyList<PokerCard>> hands);
+        public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
         public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
+        public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
 
         #region Properties
 
@@ -15,6 +16,7 @@ namespace TCSHoldEmPoker.Models {
         public DidSetTurnSeatIndexHandler DidSetTurnSeatIndex = delegate { };
         public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
         public DidDealCommunityCardHandler DidDealCommunityCard = delegate { };
+        public DidDealCardsToPlayersHandler DidDealCardsToPlayers = delegate { };
 
         // Wagering Properties
         private int SmallBlindWager => MinimumWager / 2;
@@ -57,6 +59,15 @@ namespace TCSHoldEmPoker.Models {
         }
 
         #region Player Query Methods
+
+        private IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> GetAllPlayerHands () {
+            Dictionary<int, IReadOnlyList<PokerCard>> playerHands = new ();
+            foreach (var seat in _playerSeats) {
+                playerHands.Add (seat.SeatedPlayerID, seat.DealtCards);
+            }
+
+            return playerHands;
+        }
 
         private bool CheckSeatIndexPlayStatus (int index) {
             if (index < 0 || index >= TABLE_CAPACITY)
@@ -196,6 +207,8 @@ namespace TCSHoldEmPoker.Models {
                     _playerSeats[j].ReceiveCard (_deck.GetNextCard ());
                 }
             }
+
+            DidDealCardsToPlayers?.Invoke (_gameTableID, GetAllPlayerHands ());
         }
 
         private void DetermineBlinds () {
@@ -273,12 +286,7 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void RevealAllHands () {
-            Dictionary<int, IReadOnlyList<PokerCard>> playerHands = new ();
-            foreach (var seat in _playerSeats) {
-                playerHands.Add (seat.SeatedPlayerID, seat.DealtCards);
-            }
-
-            DidRevealAllHands?.Invoke (_gameTableID, playerHands);
+            DidRevealAllHands?.Invoke (_gameTableID, GetAllPlayerHands ());
         }
 
         private void DealMissingCommunityCards () {
