@@ -4,11 +4,17 @@ using TCSHoldEmPoker.Models.Define;
 namespace TCSHoldEmPoker.Models {
     public class GameTableModelServer : GameTableModel {
 
-        public delegate void DidGamePhaseChangeHandler (PokerGamePhase phase, int gameTableID);
+        public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
+        public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
+        public delegate void DidRevealAllHandsHandler (int gameTableID, Dictionary<int, IReadOnlyList<PokerCard>> hands);
+        public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
 
         #region Properties
 
         public DidGamePhaseChangeHandler DidGamePhaseChange = delegate { };
+        public DidSetTurnSeatIndexHandler DidSetTurnSeatIndex = delegate { };
+        public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
+        public DidDealCommunityCardHandler DidDealCommunityCard = delegate { };
 
         // Wagering Properties
         private int SmallBlindWager => MinimumWager / 2;
@@ -30,7 +36,7 @@ namespace TCSHoldEmPoker.Models {
             _currentTableStake = 0;
             _cashPot = 0;
 
-            _currentTurnPlayerIndex = 0;
+            _currentTurnSeatIndex = 0;
             for (int i = 0; i < TABLE_CAPACITY; i++) {
                 _playerSeats[i] = new ();
             }
@@ -130,6 +136,22 @@ namespace TCSHoldEmPoker.Models {
 
         #region Game Sequence Methods
 
+        private void TriggerGamePhase (PokerGamePhase gamePhase) {
+            _currentGamePhase = gamePhase;
+            DidGamePhaseChange?.Invoke (GameTableID, _currentGamePhase);
+        }
+
+        private void DealCommunityCard (int cardIndex) {
+            PokerCard dealtCard = _deck.GetNextCard ();
+            _communityCards[cardIndex] = dealtCard;
+            DidDealCommunityCard?.Invoke (_gameTableID, dealtCard, cardIndex);
+        }
+
+        private void ProceedPlayerTurn () {
+            GoToNextPlayingPlayer ();
+            DidSetTurnSeatIndex?.Invoke (_gameTableID, _currentTurnSeatIndex);
+        }
+
         private void StartNewAnte () {
             ReadyPlayersForAnte ();
 
@@ -137,7 +159,7 @@ namespace TCSHoldEmPoker.Models {
             _deck.Shuffle ();
 
             // Pre-Flop Game Phase.
-            _currentGamePhase = PokerGamePhase.PRE_FLOP;
+            TriggerGamePhase (PokerGamePhase.PRE_FLOP);
 
             DealCardsToPlayers ();
             DetermineBlinds ();
@@ -146,15 +168,10 @@ namespace TCSHoldEmPoker.Models {
             ProceedPlayerTurn ();
         }
 
-        private void ProceedPlayerTurn () {
-            GoToNextPlayingPlayer ();
-            // TODO: Trigger for Turn Player Event.
-        }
-
         private void GoToNextPlayingPlayer () {
             for (int i = 0; i < TABLE_CAPACITY; i++) {
-                _currentTurnPlayerIndex = (_currentTurnPlayerIndex + 1) % TABLE_CAPACITY;
-                if (CheckSeatIndexPlayStatus(_currentTurnPlayerIndex))
+                _currentTurnSeatIndex = (_currentTurnSeatIndex + 1) % TABLE_CAPACITY;
+                if (CheckSeatIndexPlayStatus(_currentTurnSeatIndex))
                     break; // Found playing player. Stop enum.
             }
         }
@@ -183,11 +200,11 @@ namespace TCSHoldEmPoker.Models {
 
         private void DetermineBlinds () {
             // Small Blind wagering.
-            _currentTurnPlayerIndex = _nextDealerIndex;
+            _currentTurnSeatIndex = _nextDealerIndex;
             _currentDealerIndex = _nextDealerIndex; // For after the Flop.
             GoToNextPlayingPlayer (); // Next player after the Dealer is the Small Blind.
             CurrentTurningSeat.RaiseWagerTo (SmallBlindWager);
-            _nextDealerIndex = _currentTurnPlayerIndex; // Current Small Blind is next Dealer.
+            _nextDealerIndex = _currentTurnSeatIndex; // Current Small Blind is next Dealer.
 
             // Big Blind wagering.
             GoToNextPlayingPlayer (); // Next player after the Small Blind is the Big Blind.
@@ -197,23 +214,23 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void RevealTheFlop () {
-            _currentGamePhase = PokerGamePhase.THE_FLOP;
+            TriggerGamePhase (PokerGamePhase.THE_FLOP);
             DealTheFlopCards ();
 
             // Next turning player is the player immediately after the Dealer.
-            _currentTurnPlayerIndex = _currentDealerIndex;
+            _currentTurnSeatIndex = _currentDealerIndex;
             ProceedPlayerTurn ();
         }
 
         private void DealTheFlopCards () {
             _deck.GetNextCard (); // Burn Card.
-            _communityCards[0] = _deck.GetNextCard ();
-            _communityCards[1] = _deck.GetNextCard ();
-            _communityCards[2] = _deck.GetNextCard ();
+            DealCommunityCard (cardIndex: 0);
+            DealCommunityCard (cardIndex: 1);
+            DealCommunityCard (cardIndex: 2);
         }
 
         private void RevealTheTurn () {
-            _currentGamePhase = PokerGamePhase.THE_TURN;
+            TriggerGamePhase (PokerGamePhase.THE_TURN);
             DealTheTurnCards ();
 
             ProceedPlayerTurn ();
@@ -221,11 +238,11 @@ namespace TCSHoldEmPoker.Models {
 
         private void DealTheTurnCards () {
             _deck.GetNextCard (); // Burn Card.
-            _communityCards[3] = _deck.GetNextCard ();
+            DealCommunityCard (cardIndex: 3);
         }
 
         private void RevealTheRiver () {
-            _currentGamePhase = PokerGamePhase.THE_RIVER;
+            TriggerGamePhase (PokerGamePhase.THE_RIVER);
             DealTheRiverCards ();
 
             ProceedPlayerTurn ();
@@ -233,40 +250,38 @@ namespace TCSHoldEmPoker.Models {
 
         private void DealTheRiverCards () {
             _deck.GetNextCard (); // Burn Card.
-            _communityCards[4] = _deck.GetNextCard ();
+            DealCommunityCard (cardIndex: 4);
         }
 
         private void HandShowdown () {
-            _currentGamePhase = PokerGamePhase.GAME_END;
+            TriggerGamePhase (PokerGamePhase.SHOWDOWN);
 
-            List<TableSeatModel> winningSeats = new ();
-            PokerHand currentWinningHand = BlankPokerHand.BlankHand;
-            foreach (var seat in _playerSeats) {
-                if (seat.IsPlaying) {
-                    PokerHand seatHand = PokerHandFactory.GetHighestPokerHandWithCardSets (_communityCards, seat.DealtCards);
-                    int handComp = seatHand.CompareTo (currentWinningHand);
+            RevealAllHands ();
+            DealMissingCommunityCards ();
 
-                    if (handComp > 0) { // Winning hand overtake.
-                        currentWinningHand = seatHand;
-                        winningSeats.Clear ();
-                        winningSeats.Add (seat);
+            if (CalculateWinners (out var winnerSeats, out var winningHand)) {
+                TriggerGamePhase (PokerGamePhase.WINNING);
 
-                    } else if (handComp == 0) { // Current winning hand is tied with.
-                        winningSeats.Add (seat);
-                    }
+                // Calculate player/s prize.
+                int chipPrize = _cashPot / winnerSeats.Count;
+                foreach (var seat in winnerSeats) {
+                    seat.GiveChips (chipPrize);
                 }
-            }
-
-            // Calculate player/s prize.
-            int chipPrize = _cashPot / winningSeats.Count;
-            foreach (var seat in winningSeats) {
-                seat.GiveChips (chipPrize);
             }
 
             EndOfAnte ();
         }
 
-        private void AllInShowdown () {
+        private void RevealAllHands () {
+            Dictionary<int, IReadOnlyList<PokerCard>> playerHands = new ();
+            foreach (var seat in _playerSeats) {
+                playerHands.Add (seat.SeatedPlayerID, seat.DealtCards);
+            }
+
+            DidRevealAllHands?.Invoke (_gameTableID, playerHands);
+        }
+
+        private void DealMissingCommunityCards () {
             if (_communityCards[0].Equals (PokerCard.BLANK)) { // If NO Flop yet.
                 DealTheFlopCards ();
             }
@@ -276,14 +291,34 @@ namespace TCSHoldEmPoker.Models {
             if (_communityCards[4].Equals (PokerCard.BLANK)) { // If NO River yet.
                 DealTheRiverCards ();
             }
+        }
 
-            HandShowdown ();
+        private bool CalculateWinners (out List<TableSeatModel> winnerSeats, out PokerHand winningHand) {
+            winnerSeats = new ();
+            winningHand = BlankPokerHand.BlankHand;
+            foreach (var seat in _playerSeats) {
+                if (seat.IsPlaying) {
+                    PokerHand seatHand = PokerHandFactory.GetHighestPokerHandWithCardSets (_communityCards, seat.DealtCards);
+                    int handComp = seatHand.CompareTo (winningHand);
+
+                    if (handComp > 0) { // Winning hand overtake.
+                        winningHand = seatHand;
+                        winnerSeats.Clear ();
+                        winnerSeats.Add (seat);
+
+                    } else if (handComp == 0) { // Current winning hand is tied with.
+                        winnerSeats.Add (seat);
+                    }
+                }
+            }
+
+            return winningHand.HandRank != PokerHandRankEnum.NULL;
         }
 
         private void WinByDefault (int playerID) {
             GatherWagersToPot ();
 
-            _currentGamePhase = PokerGamePhase.GAME_END;
+            TriggerGamePhase (PokerGamePhase.WINNING);
 
             if (FindSeatWithPlayerID (playerID, out var seat)) {
                 seat.GiveChips (_cashPot);
@@ -300,7 +335,7 @@ namespace TCSHoldEmPoker.Models {
             }
 
             if (GetSeatedPlayerCount () < 2) {
-                _currentGamePhase = PokerGamePhase.WAITING;
+                TriggerGamePhase (PokerGamePhase.WAITING);
             } else {
                 StartNewAnte ();
             }
@@ -311,46 +346,54 @@ namespace TCSHoldEmPoker.Models {
                 WinByDefault (soloPlayer);
                 return;
             }
+            
+            if (CheckIfAllBetted (out bool onMaxBet)) {
+                GatherWagersToPot ();
 
+                if (onMaxBet) { 
+                    // Max betting reached. Proceed to Showdown.
+                    HandShowdown ();
+                } else {
+                    ProceedToNextPhase ();
+                }
+            } else {
+                ProceedPlayerTurn ();
+            }
+        }
+
+        private void ProceedToNextPhase () {
+            switch (_currentGamePhase) {
+                case PokerGamePhase.PRE_FLOP:
+                    RevealTheFlop ();
+                    break;
+                case PokerGamePhase.THE_FLOP:
+                    RevealTheTurn ();
+                    break;
+                case PokerGamePhase.THE_TURN:
+                    RevealTheRiver ();
+                    break;
+                case PokerGamePhase.THE_RIVER:
+                    HandShowdown ();
+                    break;
+            }
+        }
+
+        private bool CheckIfAllBetted (out bool onMaxBet) {
             int playersWithChips = 0;
-            bool allChecked = true;
             foreach (var seat in _playerSeats) {
                 if (seat.IsPlaying) {
                     if (!seat.DidCheck) {
-                        allChecked = false;
-                        break;
+                        onMaxBet = false;
+                        return false;
                     }
                     if (seat.SeatedPlayerChips > 0) {
                         playersWithChips++;
                     }
                 }
             }
-            
-            if (!allChecked) {
-                ProceedPlayerTurn ();
-            } else {
-                GatherWagersToPot ();
 
-                if (playersWithChips <= 1) { // Max betting reached.
-                    AllInShowdown ();
-                    return;
-                }
-
-                switch (_currentGamePhase) {
-                    case PokerGamePhase.PRE_FLOP:
-                        RevealTheFlop ();
-                        break;
-                    case PokerGamePhase.THE_FLOP:
-                        RevealTheTurn ();
-                        break;
-                    case PokerGamePhase.THE_TURN:
-                        RevealTheRiver ();
-                        break;
-                    case PokerGamePhase.THE_RIVER:
-                        HandShowdown ();
-                        break;
-                }
-            }
+            onMaxBet = playersWithChips <= 1;
+            return true;
         }
 
         #endregion

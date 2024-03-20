@@ -23,7 +23,7 @@ namespace TCSHoldEmPoker.Models {
             _currentTableStake = tsd.currentTableStake;
             _cashPot = tsd.cashPot;
 
-            _currentTurnPlayerIndex = tsd.currentTurnPlayerIndex;
+            _currentTurnSeatIndex = tsd.currentTurnPlayerIndex;
             int seatIndex = 0;
             foreach (var seatData in tsd.seatStateDataOrder) {
                 _playerSeats[seatIndex] = new TableSeatModel (seatData);

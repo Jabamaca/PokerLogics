@@ -6,6 +6,7 @@ namespace TCSHoldEmPoker.Models.Define {
         THE_FLOP    = 0x3,
         THE_TURN    = 0x4,
         THE_RIVER   = 0x5,
-        GAME_END    = 0x6,
+        SHOWDOWN    = 0x6,
+        WINNING     = 0x7,
     }
 }
