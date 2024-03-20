@@ -26,6 +26,7 @@ namespace TCSHoldEmPoker.Models {
         public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
 
         // Win Condition Delegates
+        public delegate void DidGatherWagersToPotHandler (int gameTableID, int newCashPot);
         public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
         public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon);
 
@@ -52,6 +53,7 @@ namespace TCSHoldEmPoker.Models {
         public DidPlayerFoldHandler DidPlayerFold = delegate { };
 
         // Win Condition Delegates
+        public DidGatherWagersToPotHandler DidGatherWagersToPot = delegate { };
         public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
         public DidPlayerWinHandler DidPlayerWin = delegate { };
 
@@ -523,8 +525,14 @@ namespace TCSHoldEmPoker.Models {
         #region Wagering Methods
 
         private void GatherWagersToPot () {
+            int gatheredWagers = 0;
             for (int i = 0; i < TABLE_CAPACITY; i++) {
-                _cashPot += _playerSeats[i].CollectWageredChips ();
+                gatheredWagers += _playerSeats[i].CollectWageredChips ();
+            }
+
+            if (gatheredWagers > 0) {
+                _cashPot += gatheredWagers;
+                DidGatherWagersToPot?.Invoke (_gameTableID, _cashPot);
             }
 
             _currentTableStake = 0;
