@@ -39,8 +39,6 @@ namespace TCSHoldEmPoker.Models {
 
         #region Methods
 
-        #region Player Query Methods
-
         protected bool FindSeatWithPlayerID (int playerID, out TableSeatModel seat) {
             for (int i = 0; i < TABLE_CAPACITY; i++) {
                 if (_playerSeats[i].SeatedPlayerID == playerID) {
@@ -53,7 +51,21 @@ namespace TCSHoldEmPoker.Models {
             return false;
         }
 
-        #endregion
+        protected void RemoveCommunityCards () {
+            for (int i = 0; i < COMMUNITY_CARD_COUNT; i++) {
+                _communityCards[i] = PokerCard.BLANK;
+            }
+        }
+
+        protected void ReadyPlayersForAnte () {
+            for (int i = 0; i < TABLE_CAPACITY; i++) {
+                if (_playerSeats[i] == null)
+                    continue;
+
+                _playerSeats[i].SurrenderCards ();
+                _playerSeats[i].SetReadyForAnte ();
+            }
+        }
 
         #region Game State Methods
 
@@ -79,6 +91,16 @@ namespace TCSHoldEmPoker.Models {
                 currentGamePhase = _currentGamePhase,
                 communityCardsOrder = cardOrder
             };
+        }
+
+        #endregion
+
+        #region Wagering Methods
+
+        protected void RemoveAllChecks () {
+            for (int i = 0; i < TABLE_CAPACITY; i++) {
+                _playerSeats[i].Uncheck ();
+            }
         }
 
         #endregion

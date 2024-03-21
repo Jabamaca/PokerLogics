@@ -6,12 +6,14 @@ namespace TCSHoldEmPoker.Models {
     public class GameTableModelServer : GameTableModel {
 
         // Connectivity Delegates
-        public delegate void DidPlayerJoinHandler (int gameTableID, int playerID);
-        public delegate void DidPlayerLeaveHandler (int gameTableID, int playerID);
+        public delegate void DidPlayerJoinHandler (int gameTableID, int playerID, int buyInChips);
+        public delegate void DidPlayerLeaveHandler (int gameTableID, int playerID, int redeemedChips);
 
         // Game Progression Delegates
+        public delegate void DidAnteStartHandler (int gameTableID);
         public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
         public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
+        public delegate void DidAnteEndHandler (int gameTableID);
 
         // Card Distribution Delegates
         public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
@@ -21,8 +23,9 @@ namespace TCSHoldEmPoker.Models {
         public delegate void DidPlayerBetBlindHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetCheckHandler (int gameTableID, int playerID);
         public delegate void DidPlayerBetCallHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetRaiseHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetAllInHandler (int gameTableID, int playerID, int chipsSpent);
+        public delegate void DidPlayerBetRaiseHandler (int gameTableID, int playerID, int chipsSpent);
+        public delegate void DidPlayerBetRaiseAllInHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
 
         // Win Condition Delegates
@@ -37,8 +40,10 @@ namespace TCSHoldEmPoker.Models {
         public DidPlayerLeaveHandler DidPlayerLeave = delegate { };
 
         // Game Progression Delegates
+        public DidAnteStartHandler DidAnteStart = delegate { };
         public DidGamePhaseChangeHandler DidGamePhaseChange = delegate { };
         public DidSetTurnSeatIndexHandler DidSetTurnSeatIndex = delegate { };
+        public DidAnteEndHandler DidAnteEnd = delegate { };
 
         // Card Distribution Delegates
         public DidDealCardsToPlayersHandler DidDealCardsToPlayers = delegate { };
@@ -48,8 +53,9 @@ namespace TCSHoldEmPoker.Models {
         public DidPlayerBetBlindHandler DidPlayerBetBlind = delegate { };
         public DidPlayerBetCheckHandler DidPlayerBetCheck = delegate { };
         public DidPlayerBetCallHandler DidPlayerBetCall = delegate { };
-        public DidPlayerBetRaiseHandler DidPlayerBetRaise = delegate { };
         public DidPlayerBetAllInHandler DidPlayerBetAllIn = delegate { };
+        public DidPlayerBetRaiseHandler DidPlayerBetRaise = delegate { };
+        public DidPlayerBetRaiseAllInHandler DidPlayerBetRaiseAllIn = delegate { };
         public DidPlayerFoldHandler DidPlayerFold = delegate { };
 
         // Win Condition Delegates
@@ -152,7 +158,7 @@ namespace TCSHoldEmPoker.Models {
                     PlayerModel joinedPlayer = new (playerID, buyInChips);
                     seat.SeatPlayer (joinedPlayer);
 
-                    DidPlayerJoin?.Invoke (_gameTableID, playerID);
+                    DidPlayerJoin?.Invoke (_gameTableID, playerID, buyInChips);
 
                     if (_currentGamePhase == PokerGamePhase.WAITING &&
                         GetSeatedPlayerCount () >= 2) {
@@ -174,7 +180,7 @@ namespace TCSHoldEmPoker.Models {
                 seat.UnseatPlayer ();
                 seat.SurrenderCards ();
 
-                DidPlayerLeave?.Invoke (_gameTableID, playerID);
+                DidPlayerLeave?.Invoke (_gameTableID, playerID, redeemChips);
 
                 // Check remaining players in middle of game.
                 if (_currentGamePhase == PokerGamePhase.PRE_FLOP ||
@@ -208,9 +214,10 @@ namespace TCSHoldEmPoker.Models {
 
         private void StartNewAnte () {
             ReadyPlayersForAnte ();
-
             _cashPot = 0;
             _deck.Shuffle ();
+
+            DidAnteStart?.Invoke (_gameTableID);
 
             // Pre-Flop Game Phase.
             TriggerGamePhase (PokerGamePhase.PRE_FLOP);
@@ -227,16 +234,6 @@ namespace TCSHoldEmPoker.Models {
                 _currentTurnSeatIndex = (_currentTurnSeatIndex + 1) % TABLE_CAPACITY;
                 if (CheckSeatIndexPlayStatus(_currentTurnSeatIndex))
                     break; // Found playing player. Stop enum.
-            }
-        }
-
-        private void ReadyPlayersForAnte () {
-            for (int i = 0; i < TABLE_CAPACITY; i++) {
-                if (_playerSeats[i] == null)
-                    continue;
-
-                _playerSeats[i].SurrenderCards ();
-                _playerSeats[i].SetReadyForAnte ();
             }
         }
 
@@ -387,10 +384,8 @@ namespace TCSHoldEmPoker.Models {
 
         private void EndOfAnte () {
             _cashPot = 0;
-            // Remove community cards.
-            for (int i = 0; i < COMMUNITY_CARD_COUNT; i++) {
-                _communityCards[i] = PokerCard.BLANK;
-            }
+            RemoveCommunityCards ();
+            DidAnteEnd?.Invoke (_gameTableID);
 
             if (GetSeatedPlayerCount () < 2) {
                 TriggerGamePhase (PokerGamePhase.WAITING);
@@ -412,6 +407,7 @@ namespace TCSHoldEmPoker.Models {
                     // Max betting reached. Proceed to Showdown.
                     HandShowdown ();
                 } else {
+                    RemoveAllChecks ();
                     ProceedToNextPhase ();
                 }
             } else {
@@ -500,7 +496,7 @@ namespace TCSHoldEmPoker.Models {
 
                 if (newStake >= seat.SeatedPlayerChips) {
                     seat.WagerAllIn (out int chipsSpent);
-                    DidPlayerBetAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
+                    DidPlayerBetRaiseAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
                 } else {
                     seat.RaiseWagerTo (newStake, out int chipsSpent);
                     DidPlayerBetRaise?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
@@ -536,12 +532,6 @@ namespace TCSHoldEmPoker.Models {
             }
 
             _currentTableStake = 0;
-        }
-
-        private void RemoveAllChecks () {
-            for (int i = 0; i < TABLE_CAPACITY; i++) {
-                _playerSeats[i].Uncheck ();
-            }
         }
 
         #endregion

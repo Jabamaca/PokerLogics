@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Models.Define;
@@ -76,30 +77,25 @@ namespace TCSHoldEmPoker.Models {
             RemoveCommunityCards ();
             ReadyPlayersForAnte ();
             _cashPot = 0;
-
-            // Pre-Flop Game Phase.
-            _currentGamePhase = PokerGamePhase.PRE_FLOP;
-        }
-
-        private void ReadyPlayersForAnte () {
-            for (int i = 0; i < TABLE_CAPACITY; i++) {
-                if (_playerSeats[i] == null)
-                    continue;
-
-                _playerSeats[i].SurrenderCards ();
-                _playerSeats[i].SetReadyForAnte ();
-            }
-        }
-
-        private void RemoveCommunityCards () {
-            for (int i = 0; i < COMMUNITY_CARD_COUNT; i++) {
-                _communityCards[i] = PokerCard.BLANK;
-            }
         }
 
         public void SetGamePhase (PokerGamePhase gamePhase) {
+            RemoveAllChecks ();
             _currentGamePhase = gamePhase;
         }
+
+        public void SetTurnSeatIndex (int seatIndex) {
+            _currentTurnSeatIndex = seatIndex;
+        }
+
+        public void EndAnte () {
+            RemoveCommunityCards ();
+            _cashPot = 0;
+        }
+
+        #endregion
+
+        #region Card Related Methods
 
         public void DealCommunityCard (PokerCard card, int orderIndex) {
             if (orderIndex < 0 || orderIndex >= COMMUNITY_CARD_COUNT)
@@ -112,6 +108,51 @@ namespace TCSHoldEmPoker.Models {
             if (FindSeatWithPlayerID (playerID, out var seat)) {
                 seat.ReceiveCard (cards);
             }
+        }
+
+        #endregion
+
+        #region Chips Related Methods
+
+        public void GatherWagersToPot (int newCashPot) {
+            for (int i = 0; i < TABLE_CAPACITY; i++) {
+                _playerSeats[i].CollectWageredChips (); // Remove seat wagers.
+            }
+
+            _currentTableStake = 0;
+            _cashPot = newCashPot;
+        }
+
+        public void PlayerCheck (int playerID) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.DoCheck ();
+            }
+        }
+
+        public void PlayerBetSpend (int playerID, int spentChips) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.SpendToWager (spentChips);
+            }
+        }
+
+        public void PlayerBetRaiseSpend (int playerID, int spentChips) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                RemoveAllChecks ();
+                seat.SpendToWager (spentChips);
+            }
+        }
+
+        public void PlayerFold (int playerID) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.FoldHand ();
+            }
+        }
+
+        public void PlayerWinChips (int playerID, int chipsWon) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.GiveChips (chipsWon);
+            }
+
         }
 
         #endregion

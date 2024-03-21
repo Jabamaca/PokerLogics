@@ -93,23 +93,21 @@ namespace TCSHoldEmPoker.Models {
 
         #region Wagering Methods
 
-        public void RaiseWagerTo (int wager, out int spentChips) {
+        public void RaiseWagerTo (int newWager, out int spentChips) {
             spentChips = 0;
             if (IsSeatEmpty)
                 return; // No player to wager chips.
 
-            if (wager < _currentWager)
+            if (newWager < _currentWager)
                 return; // Waged chips on bets only go up.
 
-            int wagerDiff = wager - _currentWager;
-            if (wager > _seatedPlayer.ChipsInHand) {
-                // Forced All-In
-                _currentWager += _seatedPlayer.ChipsInHand;
-                _seatedPlayer.SpendAllChips (out spentChips);
+            int wagerDiff = newWager - _currentWager;
+            if (newWager > _seatedPlayer.ChipsInHand) {
+                _seatedPlayer.SpendAllChips (out spentChips); // Forced All-In
             } else {
-                _currentWager += wagerDiff;
                 _seatedPlayer.SpendChips (wagerDiff, out spentChips);
             }
+            _currentWager += spentChips;
 
             _didCheck = true;
         }
@@ -119,8 +117,15 @@ namespace TCSHoldEmPoker.Models {
             if (IsSeatEmpty)
                 return; // No player to wager chips.
 
-            _currentWager += _seatedPlayer.ChipsInHand;
             _seatedPlayer.SpendAllChips (out spentChips);
+            _currentWager += spentChips;
+
+            _didCheck = true;
+        }
+
+        public void SpendToWager (int chipsToSpend) {
+            _seatedPlayer.SpendChips (chipsToSpend, out int spentChips);
+            _currentWager += spentChips;
 
             _didCheck = true;
         }
