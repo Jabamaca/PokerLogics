@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
-using TCSHoldEmPoker.Defines;
 
 namespace TCSHoldEmPoker.Models {
     public abstract class PokerHand : IComparable {

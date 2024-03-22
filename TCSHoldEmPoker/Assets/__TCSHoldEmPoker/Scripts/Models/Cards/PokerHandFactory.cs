@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TCSHoldEmPoker.Defines;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {

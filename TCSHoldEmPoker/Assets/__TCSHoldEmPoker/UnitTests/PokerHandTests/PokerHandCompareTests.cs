@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models;
+using TCSHoldEmPoker.Models.Define;
 
 public class PokerHandCompareTests {
 

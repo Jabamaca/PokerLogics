@@ -1,4 +1,5 @@
 using TCSHoldEmPoker.Models;
+using TCSHoldEmPoker.Models.Define;
 using System.Collections.Generic;
 
 public static class TestUtils {

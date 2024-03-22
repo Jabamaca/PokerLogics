@@ -1,4 +1,4 @@
-namespace TCSHoldEmPoker.Defines {
+namespace TCSHoldEmPoker.Models.Define {
     public static class HoldEmPokerDefines {
 
         public const int POKER_HAND_SIZE = 5;

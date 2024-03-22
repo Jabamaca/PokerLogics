@@ -13,5 +13,27 @@ namespace TCSHoldEmPoker.Data {
 
         #endregion
 
+        #region Internal Methods
+
+        public override bool Equals (object obj) {
+            var other = obj as SeatStateData;
+
+            if (!this.seatedPlayerStateData.Equals (other.seatedPlayerStateData) ||
+                this.didCheck != other.didCheck ||
+                this.isPlaying != other.isPlaying ||
+                this.currentWager != other.currentWager) {
+
+                return false;
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode () {
+            return base.GetHashCode ();
+        }
+
+        #endregion
+
     }
 }

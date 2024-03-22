@@ -1,7 +1,6 @@
 using System;
-using TCSHoldEmPoker.Models.Define;
 
-namespace TCSHoldEmPoker.Models {
+namespace TCSHoldEmPoker.Models.Define {
     [Serializable]
     public readonly struct PokerCard {
 
