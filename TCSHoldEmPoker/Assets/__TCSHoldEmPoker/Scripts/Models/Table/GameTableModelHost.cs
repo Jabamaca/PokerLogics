@@ -14,7 +14,7 @@ namespace TCSHoldEmPoker.Models {
     public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
     public delegate void DidAnteEndHandler (int gameTableID);
 
-    // Card Distribution Delegates
+    // Card Dealing Delegates
     public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
     public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
 
@@ -46,7 +46,7 @@ namespace TCSHoldEmPoker.Models {
         public DidSetTurnSeatIndexHandler DidSetTurnSeatIndex = delegate { };
         public DidAnteEndHandler DidAnteEnd = delegate { };
 
-        // Card Distribution Delegates
+        // Card Dealing Delegates
         public DidDealCardsToPlayersHandler DidDealCardsToPlayers = delegate { };
         public DidDealCommunityCardHandler DidDealCommunityCard = delegate { };
 

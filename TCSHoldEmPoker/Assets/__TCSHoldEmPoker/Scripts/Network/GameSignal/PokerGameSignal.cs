@@ -6,5 +6,7 @@ namespace TCSHoldEmPoker.Network.Signals {
 
         public virtual PokerGameSignalType GameSignalType => PokerGameSignalType.NULL;
 
+        public int gameTableID;
+
     }
 }

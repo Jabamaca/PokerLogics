@@ -5,6 +5,7 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "TCSHoldEmPoker.Models",
+        "TCSHoldEmPoker.Network",
         "GameUtils"
     ],
     "includePlatforms": [],

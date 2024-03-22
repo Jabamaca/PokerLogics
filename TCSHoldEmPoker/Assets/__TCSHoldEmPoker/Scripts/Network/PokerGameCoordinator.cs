@@ -3,17 +3,45 @@ using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Network {
-    public class PokerGameServer {
+    public class PokerGameCoordinator {
 
         #region Properties
+
+        // Connectivity Delegates
+        public DidPlayerJoinHandler DidPlayerJoin = delegate { };
+        public DidPlayerLeaveHandler DidPlayerLeave = delegate { };
+
+        // Game Progression Delegates
+        public DidAnteStartHandler DidAnteStart = delegate { };
+        public DidGamePhaseChangeHandler DidGamePhaseChange = delegate { };
+        public DidSetTurnSeatIndexHandler DidSetTurnSeatIndex = delegate { };
+        public DidAnteEndHandler DidAnteEnd = delegate { };
+
+        // Card Distribution Delegates
+        public DidDealCardsToPlayersHandler DidDealCardsToPlayers = delegate { };
+        public DidDealCommunityCardHandler DidDealCommunityCard = delegate { };
+
+        // Player Action Delegates
+        public DidPlayerBetBlindHandler DidPlayerBetBlind = delegate { };
+        public DidPlayerBetCheckHandler DidPlayerBetCheck = delegate { };
+        public DidPlayerBetCallHandler DidPlayerBetCall = delegate { };
+        public DidPlayerBetCallAllInHandler DidPlayerBetCallAllIn = delegate { };
+        public DidPlayerBetRaiseHandler DidPlayerBetRaise = delegate { };
+        public DidPlayerBetRaiseAllInHandler DidPlayerBetRaiseAllIn = delegate { };
+        public DidPlayerFoldHandler DidPlayerFold = delegate { };
+
+        // Win Condition Delegates
+        public DidGatherWagersToPotHandler DidGatherWagersToPot = delegate { };
+        public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
+        public DidPlayerWinHandler DidPlayerWin = delegate { };
 
         private readonly Dictionary<int, GameTableModelHost> _gameTables = new ();
 
         #endregion
 
-        #region Internal Mehtods
+        #region Internal Methods
 
-        ~PokerGameServer () {
+        ~PokerGameCoordinator () {
             foreach (var tableKVP in _gameTables) {
                 var gameTable = tableKVP.Value;
                 RemoveDelegationFromGameTable (gameTable);
@@ -86,102 +114,6 @@ namespace TCSHoldEmPoker.Network {
             gameTable.DidRevealAllHands -= DidRevealAllHands;
             gameTable.DidPlayerWin -= DidPlayerWin;
         }
-
-        #endregion
-
-        #region Delegate Methods
-
-        #region Player Connectivity Delegates
-
-        private void DidPlayerJoin (int gameTableID, int playerID, int buyInChips) {
-
-        }
-
-        private void DidPlayerLeave (int gameTableID, int playerID, int redeemedChips) {
-        
-        }
-
-        #endregion
-
-        #region Game Progression Delegates
-
-        private void DidAnteStart (int gameTableID) {
-        
-        }
-
-        private void DidGamePhaseChange (int gameTableID, PokerGamePhase phase) {
-        
-        }
-
-        private void DidSetTurnSeatIndex (int gameTableID, int seatIndex) {
-        
-        }
-
-        private void DidAnteEnd (int gameTableID) {
-        
-        }
-
-        #endregion
-
-        #region Card Distribution Delegates
-
-        private void DidDealCardsToPlayers (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands) {
-        
-        }
-
-        private void DidDealCommunityCard (int gameTableID, PokerCard card, int cardIndex) {
-        
-        }
-
-        #endregion
-
-        #region Player Action Delegates
-
-        private void DidPlayerBetBlind (int gameTableID, int playerID, int chipsSpent) {
-        
-        }
-
-        private void DidPlayerBetCheck (int gameTableID, int playerID) {
-        
-        }
-
-        private void DidPlayerBetCall (int gameTableID, int playerID, int chipsSpent) {
-        
-        }
-
-        private void DidPlayerBetCallAllIn (int gameTableID, int playerID, int chipsSpent) {
-        
-        }
-
-        private void DidPlayerBetRaise (int gameTableID, int playerID, int chipsSpent) {
-        
-        }
-
-        private void DidPlayerBetRaiseAllIn (int gameTableID, int playerID, int chipsSpent) {
-
-        }
-
-        private void DidPlayerFold (int gameTableID, int playerID) {
-        
-        }
-
-        #endregion
-
-        #region Win Condition Delegates
-
-        private void DidGatherWagersToPot (int gameTableID, int newCashPot) {
-        
-        }
-
-        private void DidRevealAllHands (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands) {
-        
-        }
-
-        private void DidPlayerWin (int gameTableID, int playerID, int chipsWon) {
-        
-        }
-
-        #endregion
 
         #endregion
 

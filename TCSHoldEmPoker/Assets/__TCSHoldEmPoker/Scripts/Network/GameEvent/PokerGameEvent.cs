@@ -6,5 +6,7 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public virtual PokerGameEventType GameEventType => PokerGameEventType.NULL;
 
+        public int gameTableID;
+
     }
 }

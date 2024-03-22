@@ -13,7 +13,7 @@ namespace TCSHoldEmPoker.Network.Define {
         ANTE_TURN_CHANGE        = 0x05,
         ANTE_END                = 0x06,
 
-        // Card Related Events
+        // Card Dealing Events
         PLAYER_CARD_DEAL        = 0x07,
         COMMUNITY_CARD_REVEAL   = 0x08,
 
