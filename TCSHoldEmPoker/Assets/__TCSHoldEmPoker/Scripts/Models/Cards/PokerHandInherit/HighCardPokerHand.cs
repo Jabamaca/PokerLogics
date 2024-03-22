@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {
-    public class HighCardPokerHand : PokerHand {
+    public sealed class HighCardPokerHand : PokerHand {
 
         #region Properties
 

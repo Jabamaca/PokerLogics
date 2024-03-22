@@ -2,37 +2,37 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {
-    public class ThreeOfAKindPokerHand : PokerHand {
+    public sealed class OnePairPokerHand : PokerHand {
 
         #region Properties
 
-        public override PokerHandRankEnum HandRank => PokerHandRankEnum.THREE_OF_A_KIND;
+        public override PokerHandRankEnum HandRank => PokerHandRankEnum.ONE_PAIR;
 
         #endregion
 
         #region Constructors
 
-        private ThreeOfAKindPokerHand (List<PokerCard> cards) : base (cards) { }
+        private OnePairPokerHand (List<PokerCard> cards) : base (cards) { }
 
         #endregion
 
         #region Methods
 
-        internal static bool GetStrongestHand (IEnumerable<PokerCard> cards, out ThreeOfAKindPokerHand strongestHand) {
+        internal static bool GetStrongestHand (IEnumerable<PokerCard> cards, out OnePairPokerHand strongestHand) {
             var sortedCardList = GetSortedCardList (cards, HighestToLowestValue);
 
-            // Find the highest Trio, if posible.
-            if (ExtractStrongestParity (parityCount: 3, sortedCardList, out var highTrio)) {
+            // Find the highest Pair, if posible.
+            if (ExtractStrongestParity (parityCount: 2, sortedCardList, out var highPair)) {
                 List<PokerCard> finalHand = new ();
 
-                finalHand.AddRange (highTrio); // Add Trio.
+                finalHand.AddRange (highPair); // Add Pair.
                 AddMissingHighCards (finalHand, sortedCardList); // Add Kickers.
 
                 strongestHand = new (finalHand);
                 return true;
             }
 
-            // NO Trio found.
+            // NO Pair found.
             strongestHand = null;
             return false;
         }

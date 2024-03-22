@@ -3,35 +3,36 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {
+
+    // Connectivity Delegates
+    public delegate void DidPlayerJoinHandler (int gameTableID, int playerID, int buyInChips);
+    public delegate void DidPlayerLeaveHandler (int gameTableID, int playerID, int redeemedChips);
+
+    // Game Progression Delegates
+    public delegate void DidAnteStartHandler (int gameTableID);
+    public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
+    public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
+    public delegate void DidAnteEndHandler (int gameTableID);
+
+    // Card Distribution Delegates
+    public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
+    public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
+
+    // Player Action Delegates
+    public delegate void DidPlayerBetBlindHandler (int gameTableID, int playerID, int chipsSpent);
+    public delegate void DidPlayerBetCheckHandler (int gameTableID, int playerID);
+    public delegate void DidPlayerBetCallHandler (int gameTableID, int playerID, int chipsSpent);
+    public delegate void DidPlayerBetCallAllInHandler (int gameTableID, int playerID, int chipsSpent);
+    public delegate void DidPlayerBetRaiseHandler (int gameTableID, int playerID, int chipsSpent);
+    public delegate void DidPlayerBetRaiseAllInHandler (int gameTableID, int playerID, int chipsSpent);
+    public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
+
+    // Win Condition Delegates
+    public delegate void DidGatherWagersToPotHandler (int gameTableID, int newCashPot);
+    public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
+    public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon);
+
     public class GameTableModelHost : GameTableModel {
-
-        // Connectivity Delegates
-        public delegate void DidPlayerJoinHandler (int gameTableID, int playerID, int buyInChips);
-        public delegate void DidPlayerLeaveHandler (int gameTableID, int playerID, int redeemedChips);
-
-        // Game Progression Delegates
-        public delegate void DidAnteStartHandler (int gameTableID);
-        public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
-        public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
-        public delegate void DidAnteEndHandler (int gameTableID);
-
-        // Card Distribution Delegates
-        public delegate void DidDealCardsToPlayersHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
-        public delegate void DidDealCommunityCardHandler (int gameTableID, PokerCard card, int cardIndex);
-
-        // Player Action Delegates
-        public delegate void DidPlayerBetBlindHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetCheckHandler (int gameTableID, int playerID);
-        public delegate void DidPlayerBetCallHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetCallAllInHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetRaiseHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetRaiseAllInHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
-
-        // Win Condition Delegates
-        public delegate void DidGatherWagersToPotHandler (int gameTableID, int newCashPot);
-        public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
-        public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon);
 
         #region Properties
 

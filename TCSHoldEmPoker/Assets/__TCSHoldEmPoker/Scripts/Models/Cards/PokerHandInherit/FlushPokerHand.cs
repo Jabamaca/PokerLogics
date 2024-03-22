@@ -2,34 +2,37 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {
-    public class RoyalFlushPokerHand : PokerHand {
+    public sealed class FlushPokerHand : PokerHand {
 
         #region Properties
 
-        public override PokerHandRankEnum HandRank => PokerHandRankEnum.ROYAL_FLUSH;
+        public override PokerHandRankEnum HandRank => PokerHandRankEnum.FLUSH;
 
         #endregion
 
         #region Constructors
 
-        private RoyalFlushPokerHand (List<PokerCard> cards) : base (cards) { }
+        private FlushPokerHand (List<PokerCard> cards) : base (cards) { }
 
         #endregion
 
         #region Methods
 
-        internal static bool GetStrongestHand (IEnumerable<PokerCard> cards, out RoyalFlushPokerHand strongestHand) {
+        internal static bool GetStrongestHand (IEnumerable<PokerCard> cards, out FlushPokerHand strongestHand) {
             var sortedCardList = GetSortedCardList (cards, SegregatedHighestToLowestValue);
             var cardsBySuits = SeparateBySuit (sortedCardList);
 
             // Find a Flush, if posible.
             List<PokerCard> highFlush = new () { PokerCard.BLANK };
+
             foreach (var suitKVP in cardsBySuits) {
                 var suitCards = suitKVP.Value;
-                if (GetStrongestStreak (streakLength: POKER_HAND_SIZE, suitCards, out var currentFlush)) {
-                    if (currentFlush[0].Value == CardValueEnum.ACE) {
+                if (suitCards.Count >= POKER_HAND_SIZE) {
+                    List<PokerCard> currentFlush = new ();
+                    AddMissingHighCards (currentFlush, suitCards);
+
+                    if (currentFlush[0].Value > highFlush[0].Value) {
                         highFlush = currentFlush;
-                        break; // Royal Flush found. Stop enum.
                     }
                 }
             }
