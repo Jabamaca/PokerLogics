@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Models {
-    public class GameTableModelServer : GameTableModel {
+    public class GameTableModelHost : GameTableModel {
 
         // Connectivity Delegates
         public delegate void DidPlayerJoinHandler (int gameTableID, int playerID, int buyInChips);
@@ -23,7 +23,7 @@ namespace TCSHoldEmPoker.Models {
         public delegate void DidPlayerBetBlindHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetCheckHandler (int gameTableID, int playerID);
         public delegate void DidPlayerBetCallHandler (int gameTableID, int playerID, int chipsSpent);
-        public delegate void DidPlayerBetAllInHandler (int gameTableID, int playerID, int chipsSpent);
+        public delegate void DidPlayerBetCallAllInHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetRaiseHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerBetRaiseAllInHandler (int gameTableID, int playerID, int chipsSpent);
         public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
@@ -53,7 +53,7 @@ namespace TCSHoldEmPoker.Models {
         public DidPlayerBetBlindHandler DidPlayerBetBlind = delegate { };
         public DidPlayerBetCheckHandler DidPlayerBetCheck = delegate { };
         public DidPlayerBetCallHandler DidPlayerBetCall = delegate { };
-        public DidPlayerBetAllInHandler DidPlayerBetAllIn = delegate { };
+        public DidPlayerBetCallAllInHandler DidPlayerBetCallAllIn = delegate { };
         public DidPlayerBetRaiseHandler DidPlayerBetRaise = delegate { };
         public DidPlayerBetRaiseAllInHandler DidPlayerBetRaiseAllIn = delegate { };
         public DidPlayerFoldHandler DidPlayerFold = delegate { };
@@ -76,7 +76,7 @@ namespace TCSHoldEmPoker.Models {
 
         #region Constructor
 
-        public GameTableModelServer (int minWager) {
+        public GameTableModelHost (int minWager) {
             _gameTableID = GenerateGameTableID ();
 
             _minimumWager = minWager;
@@ -465,7 +465,7 @@ namespace TCSHoldEmPoker.Models {
 
                 } else if (_currentTableStake >= seat.SeatedPlayerChips) {
                     seat.WagerAllIn (out int chipsSpent);
-                    DidPlayerBetAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
+                    DidPlayerBetCallAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
 
                 } else {
                     seat.RaiseWagerTo (_currentTableStake, out int chipsSpent);

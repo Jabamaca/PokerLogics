@@ -33,10 +33,6 @@ namespace TCSHoldEmPoker.Models {
 
         #endregion
 
-        #region Constructors
-
-        #endregion
-
         #region Methods
 
         protected bool FindSeatWithPlayerID (int playerID, out TableSeatModel seat) {
