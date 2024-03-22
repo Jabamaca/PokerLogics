@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using TCSHoldEmPoker.Models;
-using UnityEngine;
 using GameUtils;
 
 public class TableActivityTests {
