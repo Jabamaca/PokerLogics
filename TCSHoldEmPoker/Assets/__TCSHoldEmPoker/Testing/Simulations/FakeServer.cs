@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using GameUtils.Observing;
 
 using TCSHoldEmPoker.Network;
+using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Events;
 
@@ -234,7 +235,7 @@ public class FakeServer : MonoBehaviour {
         });
     }
 
-    private void DidPlayerWin (int gameTableID, int playerID, int chipsWon) {
+    private void DidPlayerWin (int gameTableID, int playerID, int chipsWon, PokerHand winningHand) {
         GlobalObserver.NotifyObservers (new PlayerWinGameEvent () {
             gameTableID = gameTableID,
             playerID = playerID,
