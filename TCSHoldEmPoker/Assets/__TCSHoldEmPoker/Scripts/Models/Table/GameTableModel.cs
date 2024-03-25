@@ -1,6 +1,7 @@
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Data;
 using System.Collections.Generic;
+using System;
 
 namespace TCSHoldEmPoker.Models {
 
@@ -34,6 +35,73 @@ namespace TCSHoldEmPoker.Models {
 
         #region Methods
 
+        #region Displayable Info Methods
+
+        public int CashPot => _cashPot;
+        public PokerCard[] CommunityCards => _communityCards.Clone () as PokerCard[];
+
+        public bool TryGetPlayerIsPlaying (int playerID, out bool isPlaying) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                isPlaying = seat.IsPlaying;
+                return true;
+            }
+
+            isPlaying = false;
+            return false;
+        }
+
+        public bool TryGetPlayerIsChecked (int playerID, out bool isChecked) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                isChecked = seat.DidCheck;
+                return true;
+            }
+
+            isChecked = false;
+            return false;
+        }
+
+        public bool TryGetPlayerCurrentWager (int playerID, out int currentWager) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                currentWager = seat.CurrentWager;
+                return true;
+            }
+
+            currentWager = 0;
+            return false;
+        }
+
+        public bool TryGetPlayerChipsInHand (int playerID, out int chipsInHand) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                chipsInHand = seat.SeatedPlayerChips;
+                return true;
+            }
+
+            chipsInHand = 0;
+            return false;
+        }
+
+        public bool TryGetPlayerCards (int playerID, out IReadOnlyList<PokerCard> cards) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                cards = seat.DealtCards;
+                return true;
+            }
+
+            cards = new List<PokerCard> (); // Empty List.
+            return false;
+        }
+
+        public int GetPlayerIDAtIndex (int seatIndex) {
+            if (seatIndex < 0 || seatIndex >= TABLE_CAPACITY) {
+                return -1;
+            }
+
+            return _playerSeats[seatIndex].SeatedPlayerID;
+        }
+
+        #endregion
+
+        #region Table-Seat Utility Methods
+
         protected bool FindSeatWithPlayerID (int playerID, out TableSeatModel seat) {
             for (int i = 0; i < TABLE_CAPACITY; i++) {
                 if (_playerSeats[i].SeatedPlayerID == playerID) {
@@ -61,6 +129,8 @@ namespace TCSHoldEmPoker.Models {
                 _playerSeats[i].SetReadyForAnte ();
             }
         }
+
+        #endregion
 
         #region Game State Methods
 

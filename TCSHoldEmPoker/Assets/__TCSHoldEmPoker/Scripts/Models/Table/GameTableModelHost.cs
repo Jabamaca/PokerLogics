@@ -30,7 +30,7 @@ namespace TCSHoldEmPoker.Models {
     // Win Condition Delegates
     public delegate void DidGatherWagersToPotHandler (int gameTableID, int newCashPot);
     public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
-    public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon);
+    public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon, PokerHand winningHand);
 
     public class GameTableModelHost : GameTableModel {
 
@@ -109,7 +109,9 @@ namespace TCSHoldEmPoker.Models {
         private IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> GetAllPlayerHands () {
             Dictionary<int, IReadOnlyList<PokerCard>> playerHands = new ();
             foreach (var seat in _playerSeats) {
-                playerHands.Add (seat.SeatedPlayerID, seat.DealtCards);
+                if (seat.IsPlaying) {
+                    playerHands.Add (seat.SeatedPlayerID, seat.DealtCards);
+                }
             }
 
             return playerHands;
@@ -154,17 +156,17 @@ namespace TCSHoldEmPoker.Models {
         #region Player Connectivity Methods
 
         public bool TryPlayerIDJoin (int playerID, int buyInChips) {
+            // Don't join if already joined.
+            if (FindSeatWithPlayerID (playerID, out var foundSeat)) {
+                return false;
+            }
+
             foreach (var seat in _playerSeats) {
-                if (seat.IsSeatEmpty && seat.CurrentWager <= 0) {
+                if (seat.IsSeatEmpty) {
                     PlayerModel joinedPlayer = new (playerID, buyInChips);
                     seat.SeatPlayer (joinedPlayer);
 
                     DidPlayerJoin?.Invoke (_gameTableID, playerID, buyInChips);
-
-                    if (_currentGamePhase == PokerGamePhase.WAITING &&
-                        GetSeatedPlayerCount () >= 2) {
-                        StartNewAnte ();
-                    }
 
                     return true;
                 }
@@ -213,7 +215,12 @@ namespace TCSHoldEmPoker.Models {
             DidSetTurnSeatIndex?.Invoke (_gameTableID, _currentTurnSeatIndex);
         }
 
-        private void StartNewAnte () {
+        public void StartNewAnte () {
+            if (_currentGamePhase != PokerGamePhase.WAITING ||
+                GetSeatedPlayerCount () < 2) {
+                return;
+            }
+
             ReadyPlayersForAnte ();
             _cashPot = 0;
             _deck.Shuffle ();
@@ -321,7 +328,7 @@ namespace TCSHoldEmPoker.Models {
                 // Calculate player/s prize.
                 int chipPrize = _cashPot / winnerSeats.Count;
                 foreach (var seat in winnerSeats) {
-                    PlayerSeatWin (seat, chipPrize);
+                    PlayerSeatWin (seat, chipPrize, winningHand);
                 }
             }
 
@@ -372,15 +379,15 @@ namespace TCSHoldEmPoker.Models {
             TriggerGamePhase (PokerGamePhase.WINNING);
 
             if (FindSeatWithPlayerID (playerID, out var seat)) {
-                PlayerSeatWin (seat, _cashPot);
+                PlayerSeatWin (seat, _cashPot, BlankPokerHand.BlankHand);
             }
 
             EndOfAnte ();
         }
 
-        private void PlayerSeatWin (TableSeatModel seat, int chipsWon) {
+        private void PlayerSeatWin (TableSeatModel seat, int chipsWon, PokerHand winningHand) {
             seat.GiveChips (chipsWon);
-            DidPlayerWin?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsWon);
+            DidPlayerWin?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsWon, winningHand);
         }
 
         private void EndOfAnte () {
@@ -388,11 +395,7 @@ namespace TCSHoldEmPoker.Models {
             RemoveCommunityCards ();
             DidAnteEnd?.Invoke (_gameTableID);
 
-            if (GetSeatedPlayerCount () < 2) {
-                TriggerGamePhase (PokerGamePhase.WAITING);
-            } else {
-                StartNewAnte ();
-            }
+            TriggerGamePhase (PokerGamePhase.WAITING);
         }
 
         private void CheckAllWagerChecks () {
