@@ -131,9 +131,10 @@ namespace TCSHoldEmPoker.Models {
                 if (seat.IsPlaying) {
                     solePlayerID = seat.SeatedPlayerID;
                     playerCount++;
-                    if (playerCount > 1)
+                    if (playerCount > 1) {
                         solePlayerID = -1;
                         return false; // Player is NOT alone.
+                    }
                 }
             }
 
