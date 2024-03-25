@@ -274,6 +274,7 @@ namespace TCSHoldEmPoker.Models {
             DidPlayerBetBlind?.Invoke (_gameTableID, CurrentTurningSeat.SeatedPlayerID, bigBlindSpent);
 
             _currentTableStake = _minimumWager;
+            RemoveAllChecks (); // Blinds don't check automatically.
         }
 
         private void RevealTheFlop () {

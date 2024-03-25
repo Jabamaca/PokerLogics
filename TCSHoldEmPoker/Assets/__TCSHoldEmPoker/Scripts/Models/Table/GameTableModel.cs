@@ -37,6 +37,7 @@ namespace TCSHoldEmPoker.Models {
 
         #region Displayable Info Methods
 
+        public PokerGamePhase CurrentGamePhase => _currentGamePhase;
         public int CashPot => _cashPot;
         public PokerCard[] CommunityCards => _communityCards.Clone () as PokerCard[];
 
@@ -96,6 +97,10 @@ namespace TCSHoldEmPoker.Models {
             }
 
             return _playerSeats[seatIndex].SeatedPlayerID;
+        }
+
+        public int GetTurningPlayerID () {
+            return GetPlayerIDAtIndex (_currentTurnSeatIndex);
         }
 
         #endregion
