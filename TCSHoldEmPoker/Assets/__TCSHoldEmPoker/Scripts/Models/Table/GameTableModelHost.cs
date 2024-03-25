@@ -464,11 +464,11 @@ namespace TCSHoldEmPoker.Models {
                 return; // Not playerID's turn.
 
             TryPlayerAction (playerID, (seat) => {
-                if (_currentTableStake == 0 || seat.SeatedPlayerChips == 0) {
+                if (seat.CurrentWager >= _currentTableStake || seat.SeatedPlayerChips == 0) {
                     seat.DoCheck ();
                     DidPlayerBetCheck?.Invoke (_gameTableID, seat.SeatedPlayerID);
 
-                } else if (_currentTableStake >= seat.SeatedPlayerChips) {
+                } else if (_currentTableStake >= seat.SeatedPlayerChips + seat.CurrentWager) {
                     seat.WagerAllIn (out int chipsSpent);
                     DidPlayerBetCallAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
 
@@ -499,7 +499,7 @@ namespace TCSHoldEmPoker.Models {
             TryPlayerAction (playerID, (seat) => {
                 RemoveAllChecks ();
 
-                if (newStake >= seat.SeatedPlayerChips) {
+                if (newStake >= seat.SeatedPlayerChips + seat.CurrentWager) {
                     seat.WagerAllIn (out int chipsSpent);
                     DidPlayerBetRaiseAllIn?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
                 } else {
