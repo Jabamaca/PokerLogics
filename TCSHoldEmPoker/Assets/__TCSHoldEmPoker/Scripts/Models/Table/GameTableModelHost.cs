@@ -355,7 +355,7 @@ namespace TCSHoldEmPoker.Models {
 
         private bool CalculateWinners (out List<TableSeatModel> winnerSeats, out PokerHand winningHand) {
             winnerSeats = new ();
-            winningHand = BlankPokerHand.BlankHand;
+            winningHand = BlankHandMaker.BlankHand;
             foreach (var seat in _playerSeats) {
                 if (seat.IsPlaying) {
                     PokerHand seatHand = PokerHandFactory.GetHighestPokerHandWithCardSets (_communityCards, seat.DealtCards);
@@ -381,7 +381,7 @@ namespace TCSHoldEmPoker.Models {
             TriggerGamePhase (PokerGamePhaseEnum.WINNING);
 
             if (FindSeatWithPlayerID (playerID, out var seat)) {
-                PlayerSeatWin (seat, _cashPot, BlankPokerHand.BlankHand);
+                PlayerSeatWin (seat, _cashPot, BlankHandMaker.BlankHand);
             }
 
             EndOfAnte ();

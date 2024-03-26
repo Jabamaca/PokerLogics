@@ -26,27 +26,27 @@ namespace TCSHoldEmPoker.Models {
                 return null;
 
             // Check for highest to lowest rank hand.
-            if (RoyalFlushPokerHand.GetStrongestHand (filteredCards, out var royalFlush))
+            if (RoyalFlushHandMaker.MakeStrongestHand (filteredCards, out var royalFlush))
                 return royalFlush;
-            else if (StraightFlushPokerHand.GetStrongestHand (filteredCards, out var straightFlush))
+            else if (StraightFlushHandMaker.MakeStrongestHand (filteredCards, out var straightFlush))
                 return straightFlush;
-            else if (FourOfAKindPokerHand.GetStrongestHand (filteredCards, out var fourOfAKind))
+            else if (FourOfAKindHandMaker.MakeStrongestHand (filteredCards, out var fourOfAKind))
                 return fourOfAKind;
-            else if (FullHousePokerHand.GetStrongestHand (filteredCards, out var fullHouse))
+            else if (FullHouseHandMaker.MakeStrongestHand (filteredCards, out var fullHouse))
                 return fullHouse;
-            else if (FlushPokerHand.GetStrongestHand (filteredCards, out var flush))
+            else if (FlushHandMaker.MakeStrongestHand (filteredCards, out var flush))
                 return flush;
-            else if (StraightPokerHand.GetStrongestHand (filteredCards, out var straight))
+            else if (StraightHandMaker.MakeStrongestHand (filteredCards, out var straight))
                 return straight;
-            else if (ThreeOfAKindPokerHand.GetStrongestHand (filteredCards, out var threeOfAKind))
+            else if (ThreeOfAKindHandMaker.MakeStrongestHand (filteredCards, out var threeOfAKind))
                 return threeOfAKind;
-            else if (TwoPairPokerHand.GetStrongestHand (filteredCards, out var twoPair))
+            else if (TwoPairHandMaker.MakeStrongestHand (filteredCards, out var twoPair))
                 return twoPair;
-            else if (OnePairPokerHand.GetStrongestHand (filteredCards, out var onePair))
+            else if (OnePairHandMaker.MakeStrongestHand (filteredCards, out var onePair))
                 return onePair;
 
             // Worst rank scenario, settle for High Card.
-            HighCardPokerHand.GetStrongestHand (filteredCards, out var highCard);
+            HighCardHandMaker.GetStrongestHand (filteredCards, out var highCard);
             return highCard;
         }
 
