@@ -110,7 +110,7 @@ public class FakeServer : MonoBehaviour {
         });
     }
 
-    private void DidGamePhaseChange (int gameTableID, PokerGamePhase phase) {
+    private void DidGamePhaseChange (int gameTableID, PokerGamePhaseEnum phase) {
         GlobalObserver.NotifyObservers (new GamePhaseChangeGameEvent () {
             gameTableID = gameTableID,
             gamePhase = phase,

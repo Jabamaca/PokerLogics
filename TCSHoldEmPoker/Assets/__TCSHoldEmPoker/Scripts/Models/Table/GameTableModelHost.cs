@@ -10,7 +10,7 @@ namespace TCSHoldEmPoker.Models {
 
     // Game Progression Delegates
     public delegate void DidAnteStartHandler (int gameTableID);
-    public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhase phase);
+    public delegate void DidGamePhaseChangeHandler (int gameTableID, PokerGamePhaseEnum phase);
     public delegate void DidSetTurnSeatIndexHandler (int gameTableID, int seatIndex);
     public delegate void DidAnteEndHandler (int gameTableID);
 
@@ -89,7 +89,7 @@ namespace TCSHoldEmPoker.Models {
                 _playerSeats[i] = new ();
             }
 
-            _currentGamePhase = PokerGamePhase.WAITING;
+            _currentGamePhase = PokerGamePhaseEnum.WAITING;
             for (int i = 0; i < COMMUNITY_CARD_COUNT; i++) {
                 _communityCards[i] = PokerCard.BLANK;
             }
@@ -187,10 +187,10 @@ namespace TCSHoldEmPoker.Models {
                 DidPlayerLeave?.Invoke (_gameTableID, playerID, redeemChips);
 
                 // Check remaining players in middle of game.
-                if (_currentGamePhase == PokerGamePhase.PRE_FLOP ||
-                    _currentGamePhase == PokerGamePhase.THE_FLOP ||
-                    _currentGamePhase == PokerGamePhase.THE_TURN ||
-                    _currentGamePhase == PokerGamePhase.THE_RIVER) {
+                if (_currentGamePhase == PokerGamePhaseEnum.PRE_FLOP ||
+                    _currentGamePhase == PokerGamePhaseEnum.THE_FLOP ||
+                    _currentGamePhase == PokerGamePhaseEnum.THE_TURN ||
+                    _currentGamePhase == PokerGamePhaseEnum.THE_RIVER) {
                     CheckAllWagerChecks ();
                 }
             }
@@ -200,7 +200,7 @@ namespace TCSHoldEmPoker.Models {
 
         #region Game Sequence Methods
 
-        private void TriggerGamePhase (PokerGamePhase gamePhase) {
+        private void TriggerGamePhase (PokerGamePhaseEnum gamePhase) {
             _currentGamePhase = gamePhase;
             DidGamePhaseChange?.Invoke (GameTableID, _currentGamePhase);
         }
@@ -217,7 +217,7 @@ namespace TCSHoldEmPoker.Models {
         }
 
         public void StartNewAnte () {
-            if (_currentGamePhase != PokerGamePhase.WAITING ||
+            if (_currentGamePhase != PokerGamePhaseEnum.WAITING ||
                 GetSeatedPlayerCount () < 2) {
                 return;
             }
@@ -229,7 +229,7 @@ namespace TCSHoldEmPoker.Models {
             DidAnteStart?.Invoke (_gameTableID);
 
             // Pre-Flop Game Phase.
-            TriggerGamePhase (PokerGamePhase.PRE_FLOP);
+            TriggerGamePhase (PokerGamePhaseEnum.PRE_FLOP);
 
             DealCardsToPlayers ();
             CollectBlindWagers ();
@@ -279,7 +279,7 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void RevealTheFlop () {
-            TriggerGamePhase (PokerGamePhase.THE_FLOP);
+            TriggerGamePhase (PokerGamePhaseEnum.THE_FLOP);
             DealTheFlopCards ();
 
             // Next turning player is the player immediately after the Dealer.
@@ -295,7 +295,7 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void RevealTheTurn () {
-            TriggerGamePhase (PokerGamePhase.THE_TURN);
+            TriggerGamePhase (PokerGamePhaseEnum.THE_TURN);
             DealTheTurnCards ();
 
             ProceedPlayerTurn ();
@@ -307,7 +307,7 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void RevealTheRiver () {
-            TriggerGamePhase (PokerGamePhase.THE_RIVER);
+            TriggerGamePhase (PokerGamePhaseEnum.THE_RIVER);
             DealTheRiverCards ();
 
             ProceedPlayerTurn ();
@@ -319,13 +319,13 @@ namespace TCSHoldEmPoker.Models {
         }
 
         private void HandShowdown () {
-            TriggerGamePhase (PokerGamePhase.SHOWDOWN);
+            TriggerGamePhase (PokerGamePhaseEnum.SHOWDOWN);
 
             RevealAllHands ();
             DealMissingCommunityCards ();
 
             if (CalculateWinners (out var winnerSeats, out var winningHand)) {
-                TriggerGamePhase (PokerGamePhase.WINNING);
+                TriggerGamePhase (PokerGamePhaseEnum.WINNING);
 
                 // Calculate player/s prize.
                 int chipPrize = _cashPot / winnerSeats.Count;
@@ -378,7 +378,7 @@ namespace TCSHoldEmPoker.Models {
         private void WinByDefault (int playerID) {
             GatherWagersToPot ();
 
-            TriggerGamePhase (PokerGamePhase.WINNING);
+            TriggerGamePhase (PokerGamePhaseEnum.WINNING);
 
             if (FindSeatWithPlayerID (playerID, out var seat)) {
                 PlayerSeatWin (seat, _cashPot, BlankPokerHand.BlankHand);
@@ -397,7 +397,7 @@ namespace TCSHoldEmPoker.Models {
             RemoveCommunityCards ();
             DidAnteEnd?.Invoke (_gameTableID);
 
-            TriggerGamePhase (PokerGamePhase.WAITING);
+            TriggerGamePhase (PokerGamePhaseEnum.WAITING);
         }
 
         private void CheckAllWagerChecks () {
@@ -423,16 +423,16 @@ namespace TCSHoldEmPoker.Models {
 
         private void ProceedToNextPhase () {
             switch (_currentGamePhase) {
-                case PokerGamePhase.PRE_FLOP:
+                case PokerGamePhaseEnum.PRE_FLOP:
                     RevealTheFlop ();
                     break;
-                case PokerGamePhase.THE_FLOP:
+                case PokerGamePhaseEnum.THE_FLOP:
                     RevealTheTurn ();
                     break;
-                case PokerGamePhase.THE_TURN:
+                case PokerGamePhaseEnum.THE_TURN:
                     RevealTheRiver ();
                     break;
-                case PokerGamePhase.THE_RIVER:
+                case PokerGamePhaseEnum.THE_RIVER:
                     HandShowdown ();
                     break;
             }

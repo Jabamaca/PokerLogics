@@ -107,7 +107,7 @@ public class TestingPokerGameHost {
         Debug.Log (gameTableID + " ANTE_START");
     }
 
-    private void DidGamePhaseChange (int gameTableID, PokerGamePhase phase) {
+    private void DidGamePhaseChange (int gameTableID, PokerGamePhaseEnum phase) {
         Debug.Log (gameTableID + " PHASE_CHANGE" + " Phase:" + TestUtils.PhaseString (phase));
     }
 

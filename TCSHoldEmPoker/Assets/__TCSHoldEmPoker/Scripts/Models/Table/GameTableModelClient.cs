@@ -79,7 +79,7 @@ namespace TCSHoldEmPoker.Models {
             _cashPot = 0;
         }
 
-        public void SetGamePhase (PokerGamePhase gamePhase) {
+        public void SetGamePhase (PokerGamePhaseEnum gamePhase) {
             RemoveAllChecks ();
             _currentGamePhase = gamePhase;
         }

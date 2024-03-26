@@ -28,7 +28,7 @@ namespace TCSHoldEmPoker.Models {
         protected TableSeatModel CurrentTurningSeat => _playerSeats[_currentTurnSeatIndex];
 
         // Game Phase Properties
-        protected PokerGamePhase _currentGamePhase = PokerGamePhase.WAITING;
+        protected PokerGamePhaseEnum _currentGamePhase = PokerGamePhaseEnum.WAITING;
         protected readonly PokerCard[] _communityCards = new PokerCard[COMMUNITY_CARD_COUNT];
 
         #endregion
@@ -37,7 +37,7 @@ namespace TCSHoldEmPoker.Models {
 
         #region Displayable Info Methods
 
-        public PokerGamePhase CurrentGamePhase => _currentGamePhase;
+        public PokerGamePhaseEnum CurrentGamePhase => _currentGamePhase;
         public int CashPot => _cashPot;
         public PokerCard[] CommunityCards => _communityCards.Clone () as PokerCard[];
 

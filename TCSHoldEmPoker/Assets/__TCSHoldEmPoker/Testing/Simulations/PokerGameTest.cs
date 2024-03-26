@@ -12,7 +12,7 @@ public class PokerGameTest {
         tableHost.TableHost.TryPlayerIDJoin (playerID: 1001, buyInChips: 10000);
         Assert.IsFalse (tableHost.TableHost.TryPlayerIDJoin (playerID: 1001, buyInChips: 0)); // PlayerID can't join again.
         tableHost.TableHost.StartNewAnte ();
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.WAITING); // Can't start, only 1 player joined.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.WAITING); // Can't start, only 1 player joined.
 
         tableHost.TableHost.TryPlayerIDJoin (playerID: 2002, buyInChips: 10000);
         tableHost.TableHost.TryPlayerIDJoin (playerID: 3003, buyInChips: 10000);
@@ -24,7 +24,7 @@ public class PokerGameTest {
         // 1st player after Big Blind.
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-1 CALL Spend:1000 [0 --> 1000]
 
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.PRE_FLOP);        // Still PRE-FLOP, Blinds must still Check or Call.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.PRE_FLOP);        // Still PRE-FLOP, Blinds must still Check or Call.
 
         int smallBlindID = tableHost.CurrentTurnID;                                             // Player-2 == Small Blind
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-2 CALL Spend:500 [500 --> 1000]
@@ -37,14 +37,14 @@ public class PokerGameTest {
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CHECK Spend:0 [1000 --> 1000]
 
         // THE FLOP
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_FLOP);        // Proceed to THE FLOP.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Proceed to THE FLOP.
 
         Assert.IsTrue (tableHost.CurrentTurnID == smallBlindID);                                // Small Blind goes first after THE FLOP Reveal.
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-2 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 1000);              // ***MOVE*** Player-1 RAISE Spend:1000 [1000 --> 1000]
 
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_FLOP);        // Still THE FLOP.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Still THE FLOP.
 
         currentTurnChecker = tableHost.CurrentTurnID;
         tableHost.TableHost.PlayerCheckOrCall (bigBlindID);                                     // Player-3 INVALID MOVE ******************************************
@@ -58,25 +58,25 @@ public class PokerGameTest {
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CALL Spend:2000 [0 --> 2000]
 
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_FLOP);        // Still THE FLOP.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Still THE FLOP.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-1 CALL Spend:1000 [1000 --> 2000]
 
         // THE TURN
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_TURN);        // Proceed to THE TURN.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_TURN);        // Proceed to THE TURN.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-2 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-1 CHECK Spend:0 [0 --> 0]
 
         // THE RIVER
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_RIVER);        // Proceed to THE RIVER.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_RIVER);        // Proceed to THE RIVER.
 
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 1000);              // ***MOVE*** Player-2 Raise Spend:1000 [0 --> 1000]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 2000);              // ***MOVE*** Player-3 Raise Spend:2000 [0 --> 2000]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 3000);              // ***MOVE*** Player-1 Raise Spend:3000 [0 --> 3000]
 
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_RIVER);        // Still THE RIVER.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_RIVER);        // Still THE RIVER.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-2 CHECK Spend:2000 [1000 --> 3000]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CHECK Spend:1000 [2000 --> 3000]
@@ -106,7 +106,7 @@ public class PokerGameTest {
         Assert.AreEqual (tableHost.TableHost.CashPot, 5000);                                    // Check POT == 5000
 
         // THE-FLOP
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_FLOP);        // Proceed to THE FLOP.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Proceed to THE FLOP.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 2000);              // ***MOVE*** Player-5 RAISE Spend:2000 [0 --> 2000]
@@ -118,7 +118,7 @@ public class PokerGameTest {
         Assert.AreEqual (tableHost.TableHost.CashPot, 13000);                                    // Check POT == 13000
 
         // THE TURN
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_TURN);        // Proceed to THE TURN.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_TURN);        // Proceed to THE TURN.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-5 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 1000);              // ***MOVE*** Player-2 RAISE Spend:1000 [0 --> 1000]
@@ -129,7 +129,7 @@ public class PokerGameTest {
         Assert.AreEqual (tableHost.TableHost.CashPot, 16000);                                    // Check POT == 16000
 
         // THE RIVER
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_RIVER);        // Proceed to THE RIVER.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_RIVER);        // Proceed to THE RIVER.
 
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 5000);              // ***MOVE*** Player-2 RAISE Spend:5000 [0 --> 5000]
         tableHost.TableHost.PlayerFold (tableHost.CurrentTurnID);                               // ***MOVE*** Player-3 FOLD Spend:0 [0 --> 0]
@@ -160,7 +160,7 @@ public class PokerGameTest {
         Assert.AreEqual (tableHost.TableHost.CashPot, 5000);                                    // Check POT == 5000
 
         // THE-FLOP
-        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhase.THE_FLOP);        // Proceed to THE FLOP.
+        Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Proceed to THE FLOP.
 
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CHECK Spend:0 [0 --> 0]
         tableHost.TableHost.PlayerRaise (tableHost.CurrentTurnID, newStake: 2000);              // ***MOVE*** Player-5 RAISE Spend:2000 [0 --> 2000]

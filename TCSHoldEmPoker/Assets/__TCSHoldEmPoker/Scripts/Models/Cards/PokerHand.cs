@@ -125,7 +125,7 @@ namespace TCSHoldEmPoker.Models {
                     continue;
 
                 // Reset countdown if a Value is skipped.
-                if ((int)currentCount - (int)card.Value != 1) {
+                if ((int)currentCount - (int)card.Value != 0x10) { // Counting byte difference
                     streak.Clear ();
                 }
 

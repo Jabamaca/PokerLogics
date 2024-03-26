@@ -6,7 +6,7 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.ANTE_PHASE_CHANGE;
 
-        public PokerGamePhase gamePhase;
+        public PokerGamePhaseEnum gamePhase;
 
     }
 }

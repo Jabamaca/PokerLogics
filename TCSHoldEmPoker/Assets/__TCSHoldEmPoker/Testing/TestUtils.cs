@@ -48,16 +48,16 @@ public static class TestUtils {
         return returnHand;
     }
 
-    public static string PhaseString (PokerGamePhase phase) {
+    public static string PhaseString (PokerGamePhaseEnum phase) {
         return phase switch {
-            PokerGamePhase.NULL => "_NULL_",
-            PokerGamePhase.WAITING => "Waiting",
-            PokerGamePhase.PRE_FLOP => "Pre-Flop",
-            PokerGamePhase.THE_FLOP => "The-Flop",
-            PokerGamePhase.THE_TURN => "The-Turn",
-            PokerGamePhase.THE_RIVER => "The-River",
-            PokerGamePhase.SHOWDOWN => "Showdown",
-            PokerGamePhase.WINNING => "Winning",
+            PokerGamePhaseEnum.NULL => "_NULL_",
+            PokerGamePhaseEnum.WAITING => "Waiting",
+            PokerGamePhaseEnum.PRE_FLOP => "Pre-Flop",
+            PokerGamePhaseEnum.THE_FLOP => "The-Flop",
+            PokerGamePhaseEnum.THE_TURN => "The-Turn",
+            PokerGamePhaseEnum.THE_RIVER => "The-River",
+            PokerGamePhaseEnum.SHOWDOWN => "Showdown",
+            PokerGamePhaseEnum.WINNING => "Winning",
             _ => "_INVALID_",
         };
     }

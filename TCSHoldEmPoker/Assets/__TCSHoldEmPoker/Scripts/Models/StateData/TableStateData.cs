@@ -19,7 +19,7 @@ namespace TCSHoldEmPoker.Data {
         public List<SeatStateData> seatStateDataOrder;
 
         // Game Phase Data
-        public PokerGamePhase currentGamePhase;
+        public PokerGamePhaseEnum currentGamePhase;
         public List<PokerCard> communityCardsOrder;
 
         #endregion
