@@ -2,6 +2,7 @@ using NUnit.Framework;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
+using TCSHoldEmPoker.Data;
 
 public class GameModelByteTests {
 
@@ -42,6 +43,39 @@ public class GameModelByteTests {
 
     [Test]
     public void PokerData_PokerHandErrorData_Test () {
-        
+        byte[] handBytes = new byte[3] { 0x01, 0x41, 0x91 };
+        Assert.IsFalse (GameModelByteConverter.BytesToPokerHand (handBytes, out var hand1));
+        Assert.IsNull (hand1);
+    }
+
+    [Test]
+    public void PokerData_PlayerStateDataConversion_Test () {
+        PlayerStateData psd1 = new () {
+            playerID = 1064,
+            chipsInHand = 50000,
+        };
+
+        byte[] psdBytes = GameModelByteConverter.BytesFromPlayerStateData (psd1);
+        Assert.IsTrue (GameModelByteConverter.BytesToPlayerStateData (psdBytes, out var psd2));
+
+        Assert.IsTrue (psd1.Equals (psd2));
+    }
+
+    [Test]
+    public void PokerData_SeatStateDataConversion_Test () {
+        SeatStateData ssd1 = new () {
+            seatedPlayerStateData = new () {
+                playerID = 2345,
+                chipsInHand = 103000,
+            },
+            didCheck = false,
+            isPlaying = true,
+            currentWager = 55000,
+        };
+
+        byte[] ssdBytes = GameModelByteConverter.BytesFromSeatStateData (ssd1);
+        Assert.IsTrue (GameModelByteConverter.BytesToSeatStateData (ssdBytes, out var ssd2));
+
+        Assert.IsTrue (ssd1.Equals (ssd2));
     }
 }
