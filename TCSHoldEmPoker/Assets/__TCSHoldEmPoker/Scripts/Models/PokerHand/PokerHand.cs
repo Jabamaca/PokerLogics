@@ -9,7 +9,7 @@ namespace TCSHoldEmPoker.Models {
 
         #region Properties
 
-        private PokerHandRankEnum _handRank = PokerHandRankEnum.NULL;
+        private readonly PokerHandRankEnum _handRank = PokerHandRankEnum.NULL;
         public PokerHandRankEnum HandRank => _handRank;
 
         protected readonly PokerCard[] _cardOrder = new PokerCard[POKER_HAND_SIZE];

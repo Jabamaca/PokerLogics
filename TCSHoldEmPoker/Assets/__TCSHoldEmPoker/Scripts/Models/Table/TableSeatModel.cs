@@ -34,13 +34,13 @@ namespace TCSHoldEmPoker.Models {
             _currentWager = 0;
         }
 
-        public TableSeatModel (SeatStateData ssd) {
-            if (ssd.seatedPlayerStateData != null) {
-                _seatedPlayer = new PlayerModel (ssd.seatedPlayerStateData);
+        public TableSeatModel (SeatStateData seatStateData) {
+            if (seatStateData.seatedPlayerStateData != null) {
+                _seatedPlayer = new PlayerModel (seatStateData.seatedPlayerStateData);
             }
-            _didCheck = ssd.didCheck;
-            _isPlaying = ssd.isPlaying;
-            _currentWager = ssd.currentWager;
+            _didCheck = seatStateData.didCheck;
+            _isPlaying = seatStateData.isPlaying;
+            _currentWager = seatStateData.currentWager;
         }
 
         #endregion
@@ -160,9 +160,9 @@ namespace TCSHoldEmPoker.Models {
         #region State Data Methods
 
         public SeatStateData ConvertToStateData () {
-            PlayerStateData psd = _seatedPlayer?.ConvertToStateData ();
+            PlayerStateData playerStateData = _seatedPlayer?.ConvertToStateData ();
             return new SeatStateData {
-                seatedPlayerStateData = psd,
+                seatedPlayerStateData = playerStateData,
                 didCheck = _didCheck,
                 isPlaying = _isPlaying,
                 currentWager = _currentWager,

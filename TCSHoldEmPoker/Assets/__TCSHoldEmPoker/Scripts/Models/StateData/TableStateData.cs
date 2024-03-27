@@ -10,16 +10,16 @@ namespace TCSHoldEmPoker.Data {
         #region Properties
 
         // Wagering Data
-        public int minimumWager;
-        public int currentTableStake;
-        public int cashPot;
+        public Int32 minimumWager;
+        public Int32 currentTableStake;
+        public Int32 cashPot;
 
         // Turning Data
-        public int currentTurnPlayerIndex;
         public List<SeatStateData> seatStateDataOrder;
 
         // Game Phase Data
         public PokerGamePhaseEnum currentGamePhase;
+        public byte currentTurnPlayerIndex;
         public List<PokerCard> communityCardsOrder;
 
         #endregion

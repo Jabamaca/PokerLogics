@@ -3,6 +3,7 @@ using TCSHoldEmPoker.Models;
 using System.Collections.Generic;
 using System;
 using TCSHoldEmPoker.Data;
+using static UnityEditor.PlayerSettings;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class GameModelByteConverter {
@@ -66,9 +67,9 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER STATE DATA
 
-        public static bool BytesToPlayerStateData (byte[] bytes, out PlayerStateData psd, int startIndex = 0) {
+        public static bool BytesToPlayerStateData (byte[] bytes, out PlayerStateData playerStateData, int startIndex = 0) {
             if (bytes.Length - startIndex < ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA) {
-                psd = null;
+                playerStateData = null;
                 return false;
             }
 
@@ -80,27 +81,27 @@ namespace TCSHoldEmPoker.Network.Data {
             // Chips in Hand
             Int32 chipsInHand = BitConverter.ToInt32 (bytes, startIndex: i);
 
-            psd = new () {
+            playerStateData = new () {
                 playerID = playerID,
                 chipsInHand = chipsInHand,
             };
             return true;
         }
 
-        public static byte[] BytesFromPlayerStateData (PlayerStateData psd) {
-            if (psd == null)
+        public static byte[] BytesFromPlayerStateData (PlayerStateData playerStateData) {
+            if (playerStateData == null)
                 return null;
 
             byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA];
 
             int i = 0;
             // Player ID
-            foreach (byte playerIDByte in BitConverter.GetBytes (psd.playerID)) {
+            foreach (byte playerIDByte in BitConverter.GetBytes (playerStateData.playerID)) {
                 returnBytes[i] = playerIDByte;
                 i++;
             }
             // Chips in Hand
-            foreach (byte chipsByte in BitConverter.GetBytes (psd.chipsInHand)) {
+            foreach (byte chipsByte in BitConverter.GetBytes (playerStateData.chipsInHand)) {
                 returnBytes[i] = chipsByte;
                 i++;
             }
@@ -110,16 +111,16 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // SEAT STATE DATA
 
-        public static bool BytesToSeatStateData (byte[] bytes, out SeatStateData ssd, int startIndex = 0) {
+        public static bool BytesToSeatStateData (byte[] bytes, out SeatStateData seatStateData, int startIndex = 0) {
             if (bytes.Length - startIndex < ByteConverterUtils.SIZEOF_SEAT_STATE_DATA) {
-                ssd = null;
+                seatStateData = null;
                 return false;
             }
 
             int i = startIndex;
             // Seated Player State Data
-            if (!BytesToPlayerStateData (bytes, out var psd, startIndex: i)) {
-                ssd = null;
+            if (!BytesToPlayerStateData (bytes, out var playerStateData, startIndex: i)) {
+                seatStateData = null;
                 return false;
             }
             i += ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA;
@@ -132,8 +133,8 @@ namespace TCSHoldEmPoker.Network.Data {
             // Current Wager
             Int32 currentWager = BitConverter.ToInt32 (bytes, startIndex: i);
 
-            ssd = new () {
-                seatedPlayerStateData = psd,
+            seatStateData = new () {
+                seatedPlayerStateData = playerStateData,
                 didCheck = didCheck,
                 isPlaying = isPlaying,
                 currentWager = currentWager,
@@ -141,29 +142,129 @@ namespace TCSHoldEmPoker.Network.Data {
             return true;
         }
 
-        public static byte[] BytesFromSeatStateData (SeatStateData ssd) {
-            if (ssd == null)
+        public static byte[] BytesFromSeatStateData (SeatStateData seatStateData) {
+            if (seatStateData == null)
                 return null;
 
             byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_SEAT_STATE_DATA];
 
             int i = 0;
             // Seated Player State Data
-            foreach (byte psdByte in BytesFromPlayerStateData (ssd.seatedPlayerStateData)) {
-                returnBytes[i] = psdByte;
+            foreach (byte playerStateByte in BytesFromPlayerStateData (seatStateData.seatedPlayerStateData)) {
+                returnBytes[i] = playerStateByte;
                 i++;
             }
             // Boolean Property Set 1
             returnBytes[i] = ByteConverterUtils.ConvertBoolArrayToByte (new bool[] {
-                ssd.didCheck, ssd.isPlaying,
+                seatStateData.didCheck, seatStateData.isPlaying,
                 false, false, 
                 false, false, 
                 false, false,
             });
             i++;
             // Current Wager
-            foreach (byte chipsByte in BitConverter.GetBytes (ssd.currentWager)) {
+            foreach (byte chipsByte in BitConverter.GetBytes (seatStateData.currentWager)) {
                 returnBytes[i] = chipsByte;
+                i++;
+            }
+
+            return returnBytes;
+        }
+
+        // TABLE STATE DATA
+
+        public static bool BytesToTableStateData (byte[] bytes, out TableStateData tableStateData, int startIndex = 0) {
+            if (bytes.Length - startIndex < ByteConverterUtils.SIZEOF_TABLE_STATE_DATA) {
+                tableStateData = null;
+                return false;
+            }
+
+            int i = startIndex;
+            // Minimum Wager
+            Int32 minimumWager = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Current Table Stake
+            Int32 currentTableStake = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Cash Pot
+            Int32 cashPot = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Seat State Data Order
+            List<SeatStateData> seatStateDataOrder = new ();
+            for (int s = 0; s < HoldEmPokerDefines.POKER_TABLE_CAPACITY; s++) {
+                if (!BytesToSeatStateData (bytes, out var seatStateData, startIndex: i)) {
+                    tableStateData = null;
+                    return false;
+                }
+                seatStateDataOrder.Add (seatStateData);
+                i += ByteConverterUtils.SIZEOF_SEAT_STATE_DATA;
+            }
+            // Current Game Phase
+            PokerGamePhaseEnum currentGamePhase = (PokerGamePhaseEnum)bytes[i];
+            i += ByteConverterUtils.SIZEOF_GAME_PHASE;
+            // Current Turning Seat Index
+            byte currentTurnIndex = bytes[i];
+            i++;
+            // Community Card Order
+            List<PokerCard> communityCardOrder = new ();
+            for (int c = 0; c < HoldEmPokerDefines.COMMUNITY_CARD_COUNT; c++) {
+                PokerCard card = ByteToPokerCard (bytes[i]);
+                communityCardOrder.Add (card);
+                i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            }
+
+            tableStateData = new () {
+                minimumWager = minimumWager,
+                currentTableStake = currentTableStake,
+                cashPot = cashPot,
+                seatStateDataOrder = seatStateDataOrder,
+                currentGamePhase = currentGamePhase,
+                currentTurnPlayerIndex = currentTurnIndex,
+                communityCardsOrder = communityCardOrder,
+            };
+            return true;
+        }
+
+        public static byte[] BytesFromTableStateData (TableStateData tableStateData) {
+            if (tableStateData == null)
+                return null;
+
+            byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_TABLE_STATE_DATA];
+
+            int i = 0;
+            // Minimum Wager
+            foreach (byte minWagerByte in BitConverter.GetBytes (tableStateData.minimumWager)) {
+                returnBytes[i] = minWagerByte;
+                i++;
+            }
+            // Current Table Stake
+            foreach (byte tableStakeByte in BitConverter.GetBytes (tableStateData.currentTableStake)) {
+                returnBytes[i] = tableStakeByte;
+                i++;
+            }
+            // Cash Pot
+            foreach (byte potByte in BitConverter.GetBytes (tableStateData.cashPot)) {
+                returnBytes[i] = potByte;
+                i++;
+            }
+            // Seat State Data Order
+            for (int s = 0; s < HoldEmPokerDefines.POKER_TABLE_CAPACITY; s++) {
+                var seatStateData = tableStateData.seatStateDataOrder[s];
+                foreach (byte seatStateByte in BytesFromSeatStateData (seatStateData)) {
+                    returnBytes[i] = seatStateByte;
+                    i++;
+                }
+            }
+            // Current Game Phase
+            returnBytes[i] = (byte)tableStateData.currentGamePhase;
+            i++;
+            // Current Turn Seat Index
+            returnBytes[i] = tableStateData.currentTurnPlayerIndex;
+            i++;
+            // Community Card Order
+            for (int c = 0; c < HoldEmPokerDefines.COMMUNITY_CARD_COUNT; c++) {
+                var card = tableStateData.communityCardsOrder[c];
+                returnBytes[i] = ByteFromPokerCard (card);
                 i++;
             }
 

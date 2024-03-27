@@ -20,9 +20,9 @@ namespace TCSHoldEmPoker.Models {
             _chipsInHand = buyInChips;
         }
 
-        public PlayerModel (PlayerStateData psd) {
-            _playerID = psd.playerID;
-            _chipsInHand = psd.chipsInHand;
+        public PlayerModel (PlayerStateData playerStateData) {
+            _playerID = playerStateData.playerID;
+            _chipsInHand = playerStateData.chipsInHand;
         }
 
         #endregion

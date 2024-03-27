@@ -23,12 +23,12 @@ namespace TCSHoldEmPoker.Models {
         protected int _cashPot = 0;
 
         // Turning Properties
-        protected int _currentTurnSeatIndex = 0;
         protected readonly TableSeatModel[] _playerSeats = new TableSeatModel[TABLE_CAPACITY];
         protected TableSeatModel CurrentTurningSeat => _playerSeats[_currentTurnSeatIndex];
 
         // Game Phase Properties
         protected PokerGamePhaseEnum _currentGamePhase = PokerGamePhaseEnum.WAITING;
+        protected int _currentTurnSeatIndex = 0;
         protected readonly PokerCard[] _communityCards = new PokerCard[COMMUNITY_CARD_COUNT];
 
         #endregion
@@ -155,7 +155,7 @@ namespace TCSHoldEmPoker.Models {
                 currentTableStake = _currentTableStake,
                 cashPot = _cashPot,
 
-                currentTurnPlayerIndex = _currentTurnSeatIndex,
+                currentTurnPlayerIndex = (byte)_currentTurnSeatIndex,
                 seatStateDataOrder = seatStateOrder,
 
                 currentGamePhase = _currentGamePhase,

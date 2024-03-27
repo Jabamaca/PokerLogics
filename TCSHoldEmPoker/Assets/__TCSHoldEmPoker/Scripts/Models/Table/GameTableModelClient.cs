@@ -15,27 +15,27 @@ namespace TCSHoldEmPoker.Models {
 
         #region Constructors
 
-        public GameTableModelClient (int gameTableID, int clientPlayerID, TableStateData tsd) {
+        public GameTableModelClient (int gameTableID, int clientPlayerID, TableStateData tableStateData) {
             _gameTableID = gameTableID;
 
             _clientPlayerID = clientPlayerID;
 
-            _minimumWager = tsd.minimumWager;
-            _currentTableStake = tsd.currentTableStake;
-            _cashPot = tsd.cashPot;
+            _minimumWager = tableStateData.minimumWager;
+            _currentTableStake = tableStateData.currentTableStake;
+            _cashPot = tableStateData.cashPot;
 
-            _currentTurnSeatIndex = tsd.currentTurnPlayerIndex;
+            _currentTurnSeatIndex = tableStateData.currentTurnPlayerIndex;
             int seatIndex = 0;
-            foreach (var seatData in tsd.seatStateDataOrder) {
+            foreach (var seatData in tableStateData.seatStateDataOrder) {
                 _playerSeats[seatIndex] = new TableSeatModel (seatData);
                 seatIndex++;
                 if (seatIndex >= TABLE_CAPACITY)
                     break;
             }
 
-            _currentGamePhase = tsd.currentGamePhase;
+            _currentGamePhase = tableStateData.currentGamePhase;
             int cardIndex = 0;
-            foreach (var card in tsd.communityCardsOrder) {
+            foreach (var card in tableStateData.communityCardsOrder) {
                 _communityCards[cardIndex] = card;
                 cardIndex++;
                 if (cardIndex >= COMMUNITY_CARD_COUNT)
