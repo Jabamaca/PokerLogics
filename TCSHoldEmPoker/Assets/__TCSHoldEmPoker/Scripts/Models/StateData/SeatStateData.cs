@@ -9,7 +9,7 @@ namespace TCSHoldEmPoker.Data {
         public PlayerStateData seatedPlayerStateData;
         public bool didCheck;
         public bool isPlaying;
-        public int currentWager;
+        public Int32 currentWager;
 
         #endregion
 

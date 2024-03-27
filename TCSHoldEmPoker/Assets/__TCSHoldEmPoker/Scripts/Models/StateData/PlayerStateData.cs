@@ -6,8 +6,8 @@ namespace TCSHoldEmPoker.Data {
 
         #region Properties
 
-        public int playerID;
-        public int chipsInHand;
+        public Int32 playerID;
+        public Int32 chipsInHand;
 
         #endregion
 
