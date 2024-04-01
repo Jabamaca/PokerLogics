@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 using System.Collections.Generic;
 using GameUtils.Observing;
 
@@ -150,7 +151,7 @@ public class FakeServer : MonoBehaviour {
     private void DidDealCommunityCard (int gameTableID, PokerCard card, int cardIndex) {
         GlobalObserver.NotifyObservers (new CommunityCardDealGameEvent () {
             gameTableID = gameTableID,
-            cardIndex = cardIndex,
+            cardIndex = (Int16)cardIndex,
             pokerCard = card,
         });
     }

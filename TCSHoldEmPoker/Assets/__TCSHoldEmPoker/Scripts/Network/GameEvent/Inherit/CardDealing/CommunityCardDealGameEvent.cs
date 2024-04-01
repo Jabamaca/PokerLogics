@@ -1,3 +1,4 @@
+using System;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
 
@@ -7,7 +8,7 @@ namespace TCSHoldEmPoker.Network.Events {
         public override PokerGameEventType GameEventType => PokerGameEventType.COMMUNITY_CARD_REVEAL;
 
         public PokerCard pokerCard;
-        public int cardIndex;
+        public Int16 cardIndex;
 
     }
 }

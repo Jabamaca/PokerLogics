@@ -1,17 +1,19 @@
+using System;
+
 namespace TCSHoldEmPoker.Network.Define {
-    public enum PokerGameSignalType {
+    public enum PokerGameSignalType : Int16 {
     
-        NULL                    = 0x00,
+        NULL                                    = 0x0000,
 
         // Connectivity Signals
-        PLAYER_JOIN_REQUEST     = 0x01,
-        PLAYER_LEAVE_REQUEST    = 0x02,
+        PLAYER_REQUEST_JOIN                     = 0x0001,
+        PLAYER_REQUEST_LEAVE                    = 0x0002,
 
         // Player Action Signals
-        PLAYER_BET_CHECK        = 0x03,
-        PLAYER_BET_CALL         = 0x04,
-        PLAYER_BET_RAISE        = 0x05,
-        PLAYER_BET_FOLD         = 0x06,
+        PLAYER_INPUT_BET_CHECK                  = 0x0003,
+        PLAYER_INPUT_BET_CALL                   = 0x0004,
+        PLAYER_INPUT_BET_RAISE                  = 0x0005,
+        PLAYER_INPUT_BET_FOLD                   = 0x0006,
 
     }
 }

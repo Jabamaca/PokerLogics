@@ -125,7 +125,7 @@ namespace TCSHoldEmPoker.Network.Data {
             i += ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA;
             // Boolean Property Set 1
             byte boolByte = bytes[i];
-            bool[] boolArray = ByteConverterUtils.ConvertByteToBoolArray (boolByte);
+            bool[] boolArray = ByteConverterUtils.BoolArrayFromByte (boolByte);
             bool didCheck = boolArray[0];
             bool isPlaying = boolArray[1];
             i++;
@@ -154,7 +154,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 i++;
             }
             // Boolean Property Set 1
-            returnBytes[i] = ByteConverterUtils.ConvertBoolArrayToByte (new bool[] {
+            returnBytes[i] = ByteConverterUtils.BoolArrayToByte (new bool[] {
                 seatStateData.didCheck, seatStateData.isPlaying,
                 false, false, 
                 false, false, 
@@ -202,11 +202,11 @@ namespace TCSHoldEmPoker.Network.Data {
             PokerGamePhaseEnum currentGamePhase = (PokerGamePhaseEnum)bytes[i];
             i += ByteConverterUtils.SIZEOF_GAME_PHASE;
             // Current Turning Seat Index
-            byte currentTurnIndex = bytes[i];
+            Int16 currentTurnIndex = bytes[i];
             i++;
             // Community Card Order
             List<PokerCard> communityCardOrder = new ();
-            for (int c = 0; c < HoldEmPokerDefines.COMMUNITY_CARD_COUNT; c++) {
+            for (int c = 0; c < HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT; c++) {
                 PokerCard card = ByteToPokerCard (bytes[i]);
                 communityCardOrder.Add (card);
                 i += ByteConverterUtils.SIZEOF_CARD_DATA;
@@ -258,10 +258,10 @@ namespace TCSHoldEmPoker.Network.Data {
             returnBytes[i] = (byte)tableStateData.currentGamePhase;
             i++;
             // Current Turn Seat Index
-            returnBytes[i] = tableStateData.currentTurnPlayerIndex;
+            returnBytes[i] = (byte)tableStateData.currentTurnPlayerIndex;
             i++;
             // Community Card Order
-            for (int c = 0; c < HoldEmPokerDefines.COMMUNITY_CARD_COUNT; c++) {
+            for (int c = 0; c < HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT; c++) {
                 var card = tableStateData.communityCardsOrder[c];
                 returnBytes[i] = ByteFromPokerCard (card);
                 i++;

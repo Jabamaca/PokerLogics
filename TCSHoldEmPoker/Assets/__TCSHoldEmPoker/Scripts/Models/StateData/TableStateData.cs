@@ -19,7 +19,7 @@ namespace TCSHoldEmPoker.Data {
 
         // Game Phase Data
         public PokerGamePhaseEnum currentGamePhase;
-        public byte currentTurnPlayerIndex;
+        public Int16 currentTurnPlayerIndex;
         public List<PokerCard> communityCardsOrder;
 
         #endregion

@@ -7,8 +7,8 @@ namespace TCSHoldEmPoker.Models {
     public abstract class GameTableModel {
 
         protected const int TABLE_CAPACITY = HoldEmPokerDefines.POKER_TABLE_CAPACITY;
-        protected const int CARD_DEAL_COUNT = HoldEmPokerDefines.HOLDEM_POKER_DEAL_COUNT;
-        protected const int COMMUNITY_CARD_COUNT = HoldEmPokerDefines.COMMUNITY_CARD_COUNT;
+        protected const int CARD_DEAL_COUNT = HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT;
+        protected const int COMMUNITY_CARD_COUNT = HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT;
 
         #region Properties
 
