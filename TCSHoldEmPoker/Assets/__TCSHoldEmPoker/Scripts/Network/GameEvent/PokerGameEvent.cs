@@ -1,4 +1,5 @@
 using GameUtils.Observing;
+using System;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {
@@ -6,7 +7,7 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public virtual PokerGameEventType GameEventType => PokerGameEventType.NULL;
 
-        public int gameTableID;
+        public Int32 gameTableID;
 
     }
 }

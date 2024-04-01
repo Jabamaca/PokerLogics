@@ -3,31 +3,31 @@ using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Data {
-    internal static class ByteConverterUtils {
+    public static class ByteConverterUtils {
 
         // Sizes of Basic Data
-        internal const int SIZEOF_CARD_DATA = sizeof (byte);
-        internal const int SIZEOF_HAND_RANK = sizeof (byte);
-        internal const int SIZEOF_GAME_PHASE = sizeof (byte);
-        internal const int SIZEOF_NETWORK_ACTIVITY_ID = sizeof (Int16);
-        internal const int SIZEOF_NETWORK_ACTIVITY_START = sizeof (UInt16);
-        internal const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
+        public const int SIZEOF_CARD_DATA = sizeof (byte);
+        public const int SIZEOF_HAND_RANK = sizeof (byte);
+        public const int SIZEOF_GAME_PHASE = sizeof (byte);
+        public const int SIZEOF_NETWORK_ACTIVITY_ID = sizeof (Int16);
+        public const int SIZEOF_NETWORK_ACTIVITY_START = sizeof (UInt16);
+        public const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
 
-        internal const UInt16 NETWORK_ACTIVITY_START = 0xF99F;
-        internal const UInt16 NETWORK_ACTIVITY_END = 0xF66F;
+        public const UInt16 NETWORK_ACTIVITY_START = 0xF99F;
+        public const UInt16 NETWORK_ACTIVITY_END = 0xF66F;
 
         // Sizes of Structured Data
-        internal const int SIZEOF_HAND_DATA =
+        public const int SIZEOF_HAND_DATA =
             SIZEOF_HAND_RANK +                                                      // Hand Rank
             (HoldEmPokerDefines.POKER_HAND_SIZE * SIZEOF_CARD_DATA);                // The 5 Cards
-        internal const int SIZEOF_PLAYER_STATE_DATA =
+        public const int SIZEOF_PLAYER_STATE_DATA =
             sizeof (Int32) +                                                        // Player ID
             sizeof (Int32);                                                         // Chips in Hand
-        internal const int SIZEOF_SEAT_STATE_DATA =
+        public const int SIZEOF_SEAT_STATE_DATA =
             SIZEOF_PLAYER_STATE_DATA +                                              // Seated Player State Data
             sizeof (byte) +                                                         // BoolSet #1 (didCheck, isPlaying)
             sizeof (Int32);                                                         // Current Wager
-        internal const int SIZEOF_TABLE_STATE_DATA =
+        public const int SIZEOF_TABLE_STATE_DATA =
             sizeof (Int32) +                                                        // Minimum Wager
             sizeof (Int32) +                                                        // Current Table Stake
             sizeof (Int32) +                                                        // Cash Pot
@@ -38,14 +38,14 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // Sizes of Game Events
         // Connectivity
-        internal const int SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN =
+        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
             sizeof (Int32) +                                                        // Player ID
             sizeof (Int32) +                                                        // Buy-In Chips
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
-        internal const int SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE =
+        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
@@ -53,14 +53,14 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Game Progression
         // Card Dealing
-        internal const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
+        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
             sizeof (Int32) +                                                        // Player ID
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT) +       // Cards Data
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
-        internal const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_REVEAL =
+        public const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_REVEAL =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
@@ -70,8 +70,8 @@ namespace TCSHoldEmPoker.Network.Data {
         // Player Action
         // Win Condention
 
-        internal const int BIT_COUNT_OF_BYTE = 8;
-        internal const int BIT_COUNT_OF_INT16 = 16;
+        public const int BIT_COUNT_OF_BYTE = 8;
+        public const int BIT_COUNT_OF_INT16 = 16;
 
         internal static byte BoolArrayToByte (bool[] source) {
             if (source.Length != BIT_COUNT_OF_BYTE)

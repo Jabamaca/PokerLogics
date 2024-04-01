@@ -14,4 +14,16 @@ public class BitManipExperimentTest {
         Debug.Log ("TEST INT16: " + BitConverter.ToString (BitConverter.GetBytes (intTest16)));
     }
 
+    [Test]
+    public void BitManip_Experiment_2 () {
+        byte[] outBytes = new byte[3] { 0xCC, 0xFF, 0xFF };
+        Debug.Log ("BEFORE BYTES: " + BitConverter.ToString (outBytes));
+        ModifyInside (outBytes);
+        Debug.Log ("AFTER BYTES: " + BitConverter.ToString (outBytes));
+    }
+
+    private void ModifyInside (byte[] inBytes) {
+        inBytes[0] = 0x00;
+    }
+
 }
