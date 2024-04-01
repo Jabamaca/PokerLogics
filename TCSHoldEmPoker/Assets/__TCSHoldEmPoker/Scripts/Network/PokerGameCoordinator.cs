@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models;
-using TCSHoldEmPoker.Models.Define;
 
 namespace TCSHoldEmPoker.Network {
     public class PokerGameCoordinator {

@@ -1,9 +1,8 @@
-using TCSHoldEmPoker.Models.Define;
-using TCSHoldEmPoker.Models;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using TCSHoldEmPoker.Models;
+using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Data;
-using static UnityEditor.PlayerSettings;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class GameModelByteConverter {

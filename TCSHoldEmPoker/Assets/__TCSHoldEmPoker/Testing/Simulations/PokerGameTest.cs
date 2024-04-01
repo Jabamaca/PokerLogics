@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Security.Cryptography.X509Certificates;
 using TCSHoldEmPoker.Models.Define;
 
 public class PokerGameTest {

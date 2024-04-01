@@ -1,9 +1,7 @@
 using UnityEngine;
-using GameUtils.Observing;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
-using TCSHoldEmPoker.Network.Events;
 
 public class TestingPokerGameHost {
 
