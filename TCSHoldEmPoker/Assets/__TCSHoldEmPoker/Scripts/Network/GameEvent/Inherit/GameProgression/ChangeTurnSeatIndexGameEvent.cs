@@ -1,3 +1,4 @@
+using System;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {
@@ -5,7 +6,7 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.ANTE_TURN_CHANGE;
 
-        public int seatIndex;
+        public Int16 seatIndex;
 
     }
 }

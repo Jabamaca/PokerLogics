@@ -121,7 +121,7 @@ public class FakeServer : MonoBehaviour {
     private void DidSetTurnSeatIndex (int gameTableID, int seatIndex) {
         GlobalObserver.NotifyObservers (new ChangeTurnSeatIndexGameEvent () {
             gameTableID = gameTableID,
-            seatIndex = seatIndex,
+            seatIndex = (Int16)seatIndex,
         });
     }
 

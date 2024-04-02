@@ -34,7 +34,7 @@ namespace TCSHoldEmPoker.Network.Data {
             (SIZEOF_SEAT_STATE_DATA * HoldEmPokerDefines.POKER_TABLE_CAPACITY) +    // Seat State Data Order
             SIZEOF_GAME_PHASE +                                                     // Current Game Phase
             sizeof (Int16) +                                                        // Current Turn Seat Index
-            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);           // Community Card Order
+            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);     // Community Card Order
 
         // Sizes of Game Events
         // Connectivity
@@ -52,6 +52,28 @@ namespace TCSHoldEmPoker.Network.Data {
             sizeof (Int32) +                                                        // Player ID
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Game Progression
+        public const int SIZEOF_POKER_GAME_EVENT_ANTE_START =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+        public const int SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_GAME_PHASE +                                                     // Ante Game Phase
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+        public const int SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            sizeof (Int16) +                                                        // New Seat Index
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+        public const int SIZEOF_POKER_GAME_EVENT_ANTE_END =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Card Dealing
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream

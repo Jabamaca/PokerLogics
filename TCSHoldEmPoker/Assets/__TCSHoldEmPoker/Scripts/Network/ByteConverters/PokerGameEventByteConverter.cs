@@ -69,6 +69,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return returnBytes;
         }
 
+        // PLAYER JOIN
+
         public static bool BytesToPokerGameEventPlayerJoin (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
             return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN, out evt,
                 uniqueDataProcess: (bytes, startIndex) => {
@@ -103,6 +105,8 @@ namespace TCSHoldEmPoker.Network.Data {
                 });
         }
 
+        // PLAYER LEAVE
+
         public static bool BytesToPokerGameEventPlayerLeave (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
             return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE, out evt,
                 uniqueDataProcess: (bytes, startIndex) => {
@@ -129,6 +133,8 @@ namespace TCSHoldEmPoker.Network.Data {
                     return uniqueByteList;
                 });
         }
+
+        // PLAYER CARD DEAL
 
         public static bool BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
             return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL, out evt,
@@ -167,6 +173,8 @@ namespace TCSHoldEmPoker.Network.Data {
                 });
         }
 
+        // COMMUNITY CARD DEAL
+
         public static bool BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
             return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL, out evt,
                 uniqueDataProcess: (bytes, startIndex) => {
@@ -196,6 +204,101 @@ namespace TCSHoldEmPoker.Network.Data {
                     foreach (byte cardIndexByte in BitConverter.GetBytes (evt.cardIndex))
                         uniqueByteList.Add (cardIndexByte);
 
+                    return uniqueByteList;
+                });
+        }
+
+        // ANTE START
+
+        public static bool BytesToPokerGameEventAnteStart (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START, out evt,
+                uniqueDataProcess: (bytes, startIndex) => {
+                    // NO UNIQUE DATA
+                    return new ();
+                }, startIndex);
+        }
+
+        public static byte[] BytesFromPokerGameEventAnteStart (AnteStartGameEvent evt) {
+            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // NO UNIQUE DATA
+                    return uniqueByteList;
+                });
+        }
+
+        // ANTE PHASE CHANGE
+
+        public static bool BytesToPokerGameEventAntePhaseChange (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE, out evt,
+                uniqueDataProcess: (bytes, startIndex) => {
+                    int i = startIndex;
+                    // New Game Phase
+                    PokerGamePhaseEnum newGamePhase = (PokerGamePhaseEnum)bytes[i];
+                    i += ByteConverterUtils.SIZEOF_GAME_PHASE;
+
+                    return new () {
+                        gamePhase = newGamePhase,
+                    };
+                }, startIndex);
+        }
+
+        public static byte[] BytesFromPokerGameEventAntePhaseChange (GamePhaseChangeGameEvent evt) {
+            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new () {
+                        // New Game Phase
+                        (byte)evt.gamePhase
+                    };
+
+                    return uniqueByteList;
+                });
+        }
+
+        // ANTE TURN CHANGE
+
+        public static bool BytesToPokerGameEventAnteTurnChange (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE, out evt,
+                uniqueDataProcess: (bytes, startIndex) => {
+                    int i = startIndex;
+                    // Turning Seat Index
+                    Int16 seatIndex = BitConverter.ToInt16 (bytes, startIndex: i);
+                    i += sizeof (Int16);
+
+                    return new () {
+                        seatIndex = seatIndex,
+                    };
+                }, startIndex);
+        }
+
+        public static byte[] BytesFromPokerGameEventAnteTurnChange (ChangeTurnSeatIndexGameEvent evt) {
+            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+
+                    // Turning Seat Index
+                    foreach (byte seatIndexByte in BitConverter.GetBytes (evt.seatIndex))
+                        uniqueByteList.Add (seatIndexByte);
+
+                    return uniqueByteList;
+                });
+        }
+
+        // ANTE END
+
+        public static bool BytesToPokerGameEventAnteEnd (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END, out evt,
+                uniqueDataProcess: (bytes, startIndex) => {
+                    // NO UNIQUE DATA
+                    return new ();
+                }, startIndex);
+        }
+
+        public static byte[] BytesFromPokerGameEventAnteEnd (AnteEndGameEvent evt) {
+            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // NO UNIQUE DATA
                     return uniqueByteList;
                 });
         }
