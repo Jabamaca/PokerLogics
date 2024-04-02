@@ -18,7 +18,7 @@ namespace TCSHoldEmPoker.Network.Define {
         POKER_GAME_EVENT_ANTE_END                       = POKER_GAME_EVENT_PREFIX | PokerGameEventType.ANTE_END,
         // Card Dealing
         POKER_GAME_EVENT_PLAYER_CARD_DEAL               = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_CARD_DEAL,
-        POKER_GAME_EVENT_COMMUNITY_CARD_REVEAL          = POKER_GAME_EVENT_PREFIX | PokerGameEventType.COMMUNITY_CARD_REVEAL,
+        POKER_GAME_EVENT_COMMUNITY_CARD_DEAL            = POKER_GAME_EVENT_PREFIX | PokerGameEventType.COMMUNITY_CARD_DEAL,
         // Player Action
         POKER_GAME_EVENT_PLAYER_BET_BLIND               = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_BET_BLIND,
         POKER_GAME_EVENT_PLAYER_BET_CHECK               = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_BET_CHECK,

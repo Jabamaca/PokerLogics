@@ -17,7 +17,7 @@ namespace TCSHoldEmPoker.Network.Define {
 
         // Card Dealing Events
         PLAYER_CARD_DEAL                = 0x0007,
-        COMMUNITY_CARD_REVEAL           = 0x0008,
+        COMMUNITY_CARD_DEAL             = 0x0008,
 
         // Player Action Events
         PLAYER_BET_BLIND                = 0x0009,

@@ -60,7 +60,7 @@ namespace TCSHoldEmPoker.Network.Data {
             sizeof (Int32) +                                                        // Player ID
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT) +       // Cards Data
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
-        public const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_REVEAL =
+        public const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
