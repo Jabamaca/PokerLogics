@@ -4,20 +4,16 @@ using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Events;
-using UnityEngine.Diagnostics;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class PokerGameEventByteConverter {
 
+        private delegate int UniqueEventDataProcess<EVT> (byte[] bytes, out EVT evt, int startIndex = 0) where EVT : PokerGameEvent;
+
         #region Methods
 
-        private static bool BytesToPokerGameEvent<EVT> (byte[] bytes, int eventSize, out EVT evt, Func<byte[], int, EVT> uniqueDataProcess, int startIndex = 0) 
+        private static int BytesToPokerGameEvent<EVT> (byte[] bytes, out EVT evt, UniqueEventDataProcess<EVT> uniqueDataProcess, int startIndex = 0) 
             where EVT : PokerGameEvent {
-
-            if (bytes.Length - startIndex < eventSize) {
-                evt = null;
-                return false;
-            }
 
             int i = startIndex;
             // COMMON DATA
@@ -27,9 +23,10 @@ namespace TCSHoldEmPoker.Network.Data {
             Int32 gameTableID = BitConverter.ToInt32 (bytes, startIndex: i);
             i += sizeof (Int32);
 
-            evt = uniqueDataProcess (bytes, i);
+            i = uniqueDataProcess (bytes, out evt, startIndex: i);
             evt.gameTableID = gameTableID;
-            return true;
+            i += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
+            return i;
         }
 
         private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, Func<EVT, List<byte>> uniqueDataProcess) where EVT : PokerGameEvent {
@@ -60,7 +57,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 returnBytes[i] = uniqueByte;
                 i++;
             }
-            // Network Activity START Signature
+            // Network Activity END Signature
             foreach (byte startByte in BitConverter.GetBytes (ByteConverterUtils.NETWORK_ACTIVITY_END)) {
                 returnBytes[i] = startByte;
                 i++;
@@ -71,26 +68,29 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER JOIN
 
-        public static bool BytesToPokerGameEventPlayerJoin (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // Player ID
-                    Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-                    i += sizeof (Int32);
-                    // Buy-In Chips
-                    Int32 buyInChips = BitConverter.ToInt32 (bytes, startIndex: i);
-                    i += sizeof (Int32);
+        public static int BytesToPokerGameEventPlayerJoin (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerJoinUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        playerID = playerID,
-                        buyInChips = buyInChips,
-                    };
-                }, startIndex);
+        private static int PokerGameEventPlayerJoinUniqueDataProcess (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Player ID
+            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Buy-In Chips
+            Int32 buyInChips = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+
+            evt = new () {
+                playerID = playerID,
+                buyInChips = buyInChips,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerJoin (PlayerJoinGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
 
@@ -107,22 +107,25 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER LEAVE
 
-        public static bool BytesToPokerGameEventPlayerLeave (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // Player ID
-                    Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-                    i += sizeof (Int32);
+        public static int BytesToPokerGameEventPlayerLeave (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerLeaveUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        playerID = playerID,
-                    };
-                }, startIndex);
+        private static int PokerGameEventPlayerLeaveUniqueDataProcess (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Player ID
+            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+
+            evt = new () {
+                playerID = playerID,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerLeave (PlayerLeaveGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
 
@@ -136,29 +139,32 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER CARD DEAL
 
-        public static bool BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // Player ID
-                    Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-                    i += sizeof (Int32);
-                    // Player Cards
-                    List<PokerCard> cards = new ();
-                    for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                        cards.Add (GameModelByteConverter.ByteToPokerCard (bytes[i]));
-                        i += ByteConverterUtils.SIZEOF_CARD_DATA;
-                    }
+        public static int BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerDealCardUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        playerID = playerID,
-                        cards = cards,
-                    };
-                }, startIndex);
+        private static int PokerGameEventPlayerDealCardUniqueDataProcess (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Player ID
+            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Player Cards
+            List<PokerCard> cards = new ();
+            for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
+                cards.Add (GameModelByteConverter.ByteToPokerCard (bytes[i]));
+                i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            }
+
+            evt = new () {
+                playerID = playerID,
+                cards = cards,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerCardDeal (PlayerCardsDealGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
 
@@ -175,26 +181,29 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // COMMUNITY CARD DEAL
 
-        public static bool BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // Revealed Card
-                    PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
-                    i += ByteConverterUtils.SIZEOF_CARD_DATA;
-                    // Community Card Index
-                    Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
-                    i += sizeof (Int16);
+        public static int BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventCommunityCardDealUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        pokerCard = card,
-                        cardIndex = cardIndex,
-                    };
-                }, startIndex);
+        private static int PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Revealed Card
+            PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
+            i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            // Community Card Index
+            Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
+            i += sizeof (Int16);
+
+            evt = new () {
+                pokerCard = card,
+                cardIndex = cardIndex,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventCommunityCardDeal (CommunityCardDealGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new () {
                         // Revealed Card
@@ -210,16 +219,21 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE START
 
-        public static bool BytesToPokerGameEventAnteStart (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    // NO UNIQUE DATA
-                    return new ();
-                }, startIndex);
+        public static int BytesToPokerGameEventAnteStart (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteStartUniqueDataProcess, startIndex);
+        }
+
+        public static int PokerGameEventAnteStartUniqueDataProcess (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // NO UNIQUE DATA
+
+            evt = new ();
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteStart (AnteStartGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // NO UNIQUE DATA
@@ -229,22 +243,25 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE PHASE CHANGE
 
-        public static bool BytesToPokerGameEventAntePhaseChange (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // New Game Phase
-                    PokerGamePhaseEnum newGamePhase = (PokerGamePhaseEnum)bytes[i];
-                    i += ByteConverterUtils.SIZEOF_GAME_PHASE;
+        public static int BytesToPokerGameEventAntePhaseChange (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAntePhaseChangeUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        gamePhase = newGamePhase,
-                    };
-                }, startIndex);
+        public static int PokerGameEventAntePhaseChangeUniqueDataProcess (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // New Game Phase
+            PokerGamePhaseEnum newGamePhase = (PokerGamePhaseEnum)bytes[i];
+            i += ByteConverterUtils.SIZEOF_GAME_PHASE;
+
+            evt = new () {
+                gamePhase = newGamePhase,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAntePhaseChange (GamePhaseChangeGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new () {
                         // New Game Phase
@@ -257,22 +274,25 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE TURN CHANGE
 
-        public static bool BytesToPokerGameEventAnteTurnChange (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    int i = startIndex;
-                    // Turning Seat Index
-                    Int16 seatIndex = BitConverter.ToInt16 (bytes, startIndex: i);
-                    i += sizeof (Int16);
+        public static int BytesToPokerGameEventAnteTurnChange (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteTurnChangeUniqueDataProcess, startIndex);
+        }
 
-                    return new () {
-                        seatIndex = seatIndex,
-                    };
-                }, startIndex);
+        public static int PokerGameEventAnteTurnChangeUniqueDataProcess (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Turning Seat Index
+            Int16 seatIndex = BitConverter.ToInt16 (bytes, startIndex: i);
+            i += sizeof (Int16);
+
+            evt = new () {
+                seatIndex = seatIndex,
+            };
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteTurnChange (ChangeTurnSeatIndexGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
 
@@ -286,16 +306,21 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE END
 
-        public static bool BytesToPokerGameEventAnteEnd (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END, out evt,
-                uniqueDataProcess: (bytes, startIndex) => {
-                    // NO UNIQUE DATA
-                    return new ();
-                }, startIndex);
+        public static int BytesToPokerGameEventAnteEnd (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteEndUniqueDataProcess, startIndex);
+        }
+
+        public static int PokerGameEventAnteEndUniqueDataProcess (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // NO UNIQUE DATA
+
+            evt = new ();
+            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteEnd (AnteEndGameEvent evt) {
-            return BytesFromPokerGameEvent (evt, eventSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END,
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END;
+            return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // NO UNIQUE DATA

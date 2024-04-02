@@ -7,7 +7,7 @@ using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Events;
 
-public class PokerGameEventByuteTests {
+public class PokerGameEventByteTests {
 
     private void TestPokerGameEventByteArray (byte[] evtBytes, int expectedSize, NetworkActivityID expectedNetActID) {
         int i = 0;
@@ -33,12 +33,12 @@ public class PokerGameEventByuteTests {
             buyInChips = 1000000,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerJoin (evt1);
-        TestPokerGameEventByteArray (evtBytes, 
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_JOIN);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventPlayerJoin (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerJoin (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.buyInChips, evt2.buyInChips);
@@ -51,12 +51,12 @@ public class PokerGameEventByuteTests {
             playerID = 5342,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerLeave (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_LEAVE);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventPlayerLeave (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerLeave (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
     }
@@ -74,12 +74,12 @@ public class PokerGameEventByuteTests {
             cards = cards,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerCardDeal (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_CARD_DEAL);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventPlayerCardDeal (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerCardDeal (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.IsTrue (ListUtils.CheckEquals (evt1.cards, evt2.cards));
@@ -93,12 +93,12 @@ public class PokerGameEventByuteTests {
             cardIndex = 2,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventCommunityCardDeal (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_COMMUNITY_CARD_DEAL);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventCommunityCardDeal (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventCommunityCardDeal (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.pokerCard, evt2.pokerCard);
         Assert.AreEqual (evt1.cardIndex, evt2.cardIndex);
@@ -110,12 +110,12 @@ public class PokerGameEventByuteTests {
             gameTableID = 4859205,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAnteStart (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_START,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_START);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
     }
 
@@ -126,12 +126,12 @@ public class PokerGameEventByuteTests {
             gamePhase = PokerGamePhaseEnum.THE_RIVER,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAntePhaseChange (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_PHASE_CHANGE);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventAntePhaseChange (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAntePhaseChange (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.gamePhase, evt2.gamePhase);
     }
@@ -142,13 +142,12 @@ public class PokerGameEventByuteTests {
             gameTableID = 564567,
             seatIndex = 0,
         };
-
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAnteTurnChange (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_TURN_CHANGE);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventAnteTurnChange (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteTurnChange (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.seatIndex, evt2.seatIndex);
     }
@@ -159,12 +158,12 @@ public class PokerGameEventByuteTests {
             gameTableID = 4859205,
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END;
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAnteEnd (evt1);
-        TestPokerGameEventByteArray (evtBytes,
-            expectedSize: ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END,
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_END);
 
-        Assert.IsTrue (PokerGameEventByteConverter.BytesToPokerGameEventAnteEnd (evtBytes, out var evt2));
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteEnd (evtBytes, out var evt2), expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
     }
 

@@ -91,6 +91,29 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Player Action
         // Win Condention
+        public const int SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            sizeof (Int32) +                                                        // New Cash Pot Total
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+        public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            sizeof (Int16) +                                                        // Participating Players Count
+            /* (Player Count) * (Player ID + Cards Data) */                         // Participating Players Data (Flexible number)
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+        public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER =
+            sizeof (Int32) +                                                        // Player ID
+            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT);        // Cards Data
+        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_WIN =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            sizeof (Int32) +                                                        // Player ID
+            sizeof (Int32) +                                                        // Chips Won
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
 
         public const int BIT_COUNT_OF_BYTE = 8;
         public const int BIT_COUNT_OF_INT16 = 16;

@@ -30,7 +30,7 @@ namespace TCSHoldEmPoker.Network.Define {
 
         // Win Condition Events
         TABLE_GATHER_WAGERS             = 0x0010,
-        PLAYER_CARDS_REVEAL             = 0x0012,
+        ALL_PLAYER_CARDS_REVEAL         = 0x0012,
         PLAYER_WIN                      = 0x0013,
     }
 }
