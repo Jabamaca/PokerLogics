@@ -22,9 +22,9 @@ namespace TCSHoldEmPoker.Network.Define {
         // Player Action Events
         PLAYER_BET_BLIND                = 0x0009,
         PLAYER_BET_CHECK                = 0x000A,
-        PLAYER_BET_CALL                 = 0x000B,
+        PLAYER_BET_CALL_BASIC           = 0x000B,
         PLAYER_BET_CALL_ALL_IN          = 0x000C,
-        PLAYER_BET_RAISE                = 0x000D,
+        PLAYER_BET_RAISE_BASIC          = 0x000D,
         PLAYER_BET_RAISE_ALL_IN         = 0x000E,
         PLAYER_BET_FOLD                 = 0x000F,
 

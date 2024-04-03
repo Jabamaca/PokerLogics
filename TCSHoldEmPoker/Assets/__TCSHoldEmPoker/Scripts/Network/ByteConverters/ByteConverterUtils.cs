@@ -37,83 +37,75 @@ namespace TCSHoldEmPoker.Network.Data {
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);     // Community Card Order
 
         // Sizes of Game Events
+        // COMMON DATA
+        public const int SIZEOF_POKER_GAME_EVENT_COMMON_DATA =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                             // *** UNIQUE DATA (If Any) ***
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Connectivity
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32) +                                                        // Buy-In Chips
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            sizeof (Int32);                                                         // Buy-In Chips
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            sizeof (Int32) +                                                        // Player ID
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32);                                                         // Player ID
         // Game Progression
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_START =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            SIZEOF_GAME_PHASE +                                                     // Ante Game Phase
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            SIZEOF_GAME_PHASE;                                                      // Ante Game Phase
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            sizeof (Int16) +                                                        // New Seat Index
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int16);                                                         // New Seat Index
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_END =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
         // Card Dealing
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
-            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT) +       // Cards Data
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT);        // Cards Data
         public const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             SIZEOF_CARD_DATA +                                                      // Card Data
-            sizeof (Int16) +                                                        // Card Position (Flop 1-2-3, Turn, River)
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            sizeof (Int16);                                                         // Card Position (Flop 1-2-3, Turn, River)
         // Player Action
+        public const int SIZEOF_POKER_GAME_EVENT_BET_BLIND =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32) +                                                        // Player ID
+            sizeof (Int32);                                                         // Chips Spent
+        public const int SIZEOF_POKER_GAME_EVENT_BET_CALL =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32) +                                                        // Player ID
+            sizeof (Int32);                                                         // Chips Spent
+        public const int SIZEOF_POKER_GAME_EVENT_BET_CHECK =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32);                                                         // Player ID
+        public const int SIZEOF_POKER_GAME_EVENT_BET_RAISE =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32) +                                                        // Player ID
+            sizeof (Int32);                                                         // Chips Spent
+        public const int SIZEOF_POKER_GAME_EVENT_BET_FOLD =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32);                                                         // Player ID
         // Win Condention
         public const int SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            sizeof (Int32) +                                                        // New Cash Pot Total
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32);                                                         // New Cash Pot Total
         public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            sizeof (Int16) +                                                        // Participating Players Count
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int16);                                                         // Participating Players Count
             /* (Player Count) * (Player ID + Cards Data) */                         // Participating Players Data (Flexible number)
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER =
             sizeof (Int32) +                                                        // Player ID
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT);        // Cards Data
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_WIN =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32) +                                                        // Chips Won
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+            sizeof (Int32);                                                         // Chips Won
 
         public const int BIT_COUNT_OF_BYTE = 8;
         public const int BIT_COUNT_OF_INT16 = 16;

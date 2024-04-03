@@ -1,3 +1,4 @@
+using System;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {
@@ -5,10 +6,10 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public override PokerGameEventType GameEventType => isAllIn ? 
             PokerGameEventType.PLAYER_BET_RAISE_ALL_IN : 
-            PokerGameEventType.PLAYER_BET_RAISE;
+            PokerGameEventType.PLAYER_BET_RAISE_BASIC;
 
-        public int playerID;
-        public int chipsSpent;
+        public Int32 playerID;
+        public Int32 chipsSpent;
         public bool isAllIn;
 
     }

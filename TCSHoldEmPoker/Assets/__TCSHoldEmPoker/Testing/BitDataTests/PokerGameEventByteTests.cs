@@ -247,4 +247,141 @@ public class PokerGameEventByteTests {
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsWon, evt2.chipsWon);
     }
+
+    [Test]
+    public void PokerData_PlayerBetBlindEventConversion_Test () {
+        PlayerBetBlindGameEvent evt1 = new () {
+            gameTableID = 917771,
+            playerID = 21425,
+            chipsSpent = 1000,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_BLIND;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetBlind (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_BLIND);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetBlind (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetCheckEventConversion_Test () {
+        PlayerBetCheckGameEvent evt1 = new () {
+            gameTableID = 389127,
+            playerID = 456,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CHECK;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCheck (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CHECK);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCheck (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetFoldEventConversion_Test () {
+        PlayerFoldGameEvent evt1 = new () {
+            gameTableID = 89741,
+            playerID = 3256,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_FOLD;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetFold (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_FOLD);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetFold (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetCallBasicEventConversion_Test () {
+        PlayerBetCallGameEvent evt1 = new () {
+            gameTableID = 81111,
+            playerID = 88,
+            chipsSpent = 1500,
+            isAllIn = false,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CALL;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCall (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_BASIC);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallBasic (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
+        Assert.AreEqual (evt1.isAllIn, evt2.isAllIn);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetCallAllInEventConversion_Test () {
+        PlayerBetCallGameEvent evt1 = new () {
+            gameTableID = 11231,
+            playerID = 8128,
+            chipsSpent = 15000,
+            isAllIn = true,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CALL;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCall (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_ALL_IN);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallAllIn (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
+        Assert.AreEqual (evt1.isAllIn, evt2.isAllIn);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetRaiseBasicEventConversion_Test () {
+        PlayerBetRaiseGameEvent evt1 = new () {
+            gameTableID = 3265,
+            playerID = 7444,
+            chipsSpent = 20000,
+            isAllIn = false,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_RAISE;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetRaise (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_BASIC);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseBasic (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
+        Assert.AreEqual (evt1.isAllIn, evt2.isAllIn);
+    }
+
+    [Test]
+    public void PokerData_PlayerBetRaiseAllInEventConversion_Test () {
+        PlayerBetRaiseGameEvent evt1 = new () {
+            gameTableID = 245631,
+            playerID = 45361,
+            chipsSpent = 60000,
+            isAllIn = true,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_RAISE;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetRaise (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_ALL_IN);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseAllIn (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
+        Assert.AreEqual (evt1.isAllIn, evt2.isAllIn);
+    }
 }

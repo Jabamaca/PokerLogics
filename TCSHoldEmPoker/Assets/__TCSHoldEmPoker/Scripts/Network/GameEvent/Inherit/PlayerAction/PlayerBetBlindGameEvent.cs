@@ -1,3 +1,4 @@
+using System;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {
@@ -5,8 +6,8 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.PLAYER_BET_BLIND;
 
-        public int playerID;
-        public int chipsSpent;
+        public Int32 playerID;
+        public Int32 chipsSpent;
 
     }
 }
