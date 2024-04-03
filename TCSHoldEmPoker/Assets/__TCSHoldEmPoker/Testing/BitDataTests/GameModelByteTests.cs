@@ -8,9 +8,9 @@ public class GameModelByteTests {
 
     [Test] 
     public void PokerData_ByteToPokerCardConvert_Test () {
-        byte cardByte = 0x54; // (byte)CardValueEnum.FIVE | (byte)CardSuitEnum.SPADES;
+        byte[] cardByte = new byte[] { 0x54 }; // (byte)CardValueEnum.FIVE | (byte)CardSuitEnum.SPADES;
 
-        PokerCard cardTest = GameModelByteConverter.ByteToPokerCard (cardByte);
+        GameModelByteConverter.BytesToPokerCard (cardByte, out var cardTest);
         Assert.AreEqual (cardTest.Value, CardValueEnum.FIVE);
         Assert.AreEqual (cardTest.Suit, CardSuitEnum.SPADES);
     }
@@ -18,9 +18,11 @@ public class GameModelByteTests {
     [Test]
     public void PokerData_PokerCardToByteConvert_Test () {
         PokerCard card1 = PokerCard.CARD_2_H;
-        byte cardByte = GameModelByteConverter.ByteFromPokerCard (card1);
-        PokerCard card2 = GameModelByteConverter.ByteToPokerCard (cardByte);
+        byte[] cardByte = GameModelByteConverter.BytesFromPokerCard (card1);
+        int cardDataSize = GameModelByteConverter.BytesToPokerCard (cardByte, out var card2);
 
+        Assert.AreEqual (cardByte.Length, ByteConverterUtils.SIZEOF_CARD_DATA);
+        Assert.AreEqual (cardDataSize, ByteConverterUtils.SIZEOF_CARD_DATA);
         Assert.IsTrue (card1.Equals (card2));
     }
 
@@ -36,16 +38,9 @@ public class GameModelByteTests {
 
         PokerHand hand1 = PokerHandFactory.GetHighestPokerHandWithCardSet (cards);
         byte[] handBytes = GameModelByteConverter.BytesFromPokerHand (hand1);
-        Assert.IsTrue (GameModelByteConverter.BytesToPokerHand (handBytes, out var hand2));
+        Assert.AreEqual (GameModelByteConverter.BytesToPokerHand (handBytes, out var hand2), ByteConverterUtils.SIZEOF_HAND_DATA);
 
         Assert.AreEqual (hand1.CompareTo (hand2), 0); // Check Compare equal.
-    }
-
-    [Test]
-    public void PokerData_PokerHandErrorData_Test () {
-        byte[] handBytes = new byte[3] { 0x01, 0x41, 0x91 };
-        Assert.IsFalse (GameModelByteConverter.BytesToPokerHand (handBytes, out var hand1));
-        Assert.IsNull (hand1);
     }
 
     [Test]
@@ -56,7 +51,8 @@ public class GameModelByteTests {
         };
 
         byte[] psdBytes = GameModelByteConverter.BytesFromPlayerStateData (psd1);
-        Assert.IsTrue (GameModelByteConverter.BytesToPlayerStateData (psdBytes, out var psd2));
+        Assert.AreEqual (GameModelByteConverter.BytesToPlayerStateData (psdBytes, out var psd2), 
+            ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA);
 
         Assert.IsTrue (psd1.Equals (psd2));
     }
@@ -74,7 +70,8 @@ public class GameModelByteTests {
         };
 
         byte[] ssdBytes = GameModelByteConverter.BytesFromSeatStateData (ssd1);
-        Assert.IsTrue (GameModelByteConverter.BytesToSeatStateData (ssdBytes, out var ssd2));
+        Assert.AreEqual (GameModelByteConverter.BytesToSeatStateData (ssdBytes, out var ssd2), 
+            ByteConverterUtils.SIZEOF_SEAT_STATE_DATA);
 
         Assert.IsTrue (ssd1.Equals (ssd2));
     }
@@ -171,7 +168,8 @@ public class GameModelByteTests {
         };
 
         byte[] tsdBytes = GameModelByteConverter.BytesFromTableStateData (tsd1);
-        Assert.IsTrue (GameModelByteConverter.BytesToTableStateData (tsdBytes, out var tsd2));
+        Assert.AreEqual (GameModelByteConverter.BytesToTableStateData (tsdBytes, out var tsd2),
+            ByteConverterUtils.SIZEOF_TABLE_STATE_DATA);
 
         Assert.IsTrue (tsd1.Equals (tsd2));
     }

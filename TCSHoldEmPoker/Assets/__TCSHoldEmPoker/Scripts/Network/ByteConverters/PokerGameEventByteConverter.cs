@@ -272,8 +272,8 @@ namespace TCSHoldEmPoker.Network.Data {
             // Player Cards
             List<PokerCard> cards = new ();
             for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                cards.Add (GameModelByteConverter.ByteToPokerCard (bytes[i]));
-                i += ByteConverterUtils.SIZEOF_CARD_DATA;
+                i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
+                cards.Add (card);
             }
 
             evt = new () {
@@ -294,7 +294,7 @@ namespace TCSHoldEmPoker.Network.Data {
                         uniqueByteList.Add (playerIDByte);
                     // Player Cards
                     foreach (var card in evt.cards)
-                        uniqueByteList.Add (GameModelByteConverter.ByteFromPokerCard (card));
+                        uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (card));
 
                     return uniqueByteList;
                 });
@@ -309,8 +309,7 @@ namespace TCSHoldEmPoker.Network.Data {
         private static int PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
             int i = startIndex;
             // Revealed Card
-            PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
-            i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
             // Community Card Index
             Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
             i += sizeof (Int16);
@@ -326,10 +325,9 @@ namespace TCSHoldEmPoker.Network.Data {
             int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
-                    List<byte> uniqueByteList = new () {
-                        // Revealed Card
-                        GameModelByteConverter.ByteFromPokerCard (evt.pokerCard)
-                    };
+                    List<byte> uniqueByteList = new ();
+                    // Revealed Card
+                    uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (evt.pokerCard));
                     // Community Card Index
                     foreach (byte cardIndexByte in BitConverter.GetBytes (evt.cardIndex))
                         uniqueByteList.Add (cardIndexByte);
@@ -604,8 +602,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 // Player Cards (VALUE)
                 List<PokerCard> cards = new ();
                 for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                    PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
-                    i += ByteConverterUtils.SIZEOF_CARD_DATA;
+                    i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
                     cards.Add (card);
                 }
                 revealedHands.Add (playerID, cards);
@@ -633,7 +630,7 @@ namespace TCSHoldEmPoker.Network.Data {
                             uniqueByteList.Add (playerIDByte);
                         // Player Cards (VALUE)
                         foreach (var card in kvp.Value)
-                            uniqueByteList.Add (GameModelByteConverter.ByteFromPokerCard (card));
+                            uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (card));
                     }
 
                     return uniqueByteList;

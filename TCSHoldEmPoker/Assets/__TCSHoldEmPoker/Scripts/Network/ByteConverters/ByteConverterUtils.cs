@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
 
@@ -132,6 +133,36 @@ namespace TCSHoldEmPoker.Network.Data {
                 result[i] = (b & (0x01 << i)) != 0;
 
             return result;
+        }
+
+        internal static int AddBytesToArray (IEnumerable<byte> bytesToAdd, byte[] bytesLocation, int startIndex = 0) {
+            int i = startIndex;
+            foreach (byte byteToAdd in bytesToAdd) {
+                bytesLocation[i] = byteToAdd;
+                i++;
+            }
+            return i;
+        }
+
+        internal static int AddByteToArray (byte byteToAdd, byte[] bytesLocation, int startIndex = 0) {
+            int i = startIndex;
+            bytesLocation[i] = byteToAdd;
+            i++;
+            return i;
+        }
+
+        internal static int BytesToInt32 (byte[] bytes, out Int32 outValue, int startIndex = 0) {
+            int i = startIndex;
+            outValue = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            return i;
+        }
+
+        internal static int BytesToInt16 (byte[] bytes, out Int16 outValue, int startIndex = 0) {
+            int i = startIndex;
+            outValue = BitConverter.ToInt16 (bytes, startIndex: i);
+            i += sizeof (Int16);
+            return i;
         }
     }
 }
