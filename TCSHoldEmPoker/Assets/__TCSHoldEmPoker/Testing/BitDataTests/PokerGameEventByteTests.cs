@@ -167,4 +167,84 @@ public class PokerGameEventByteTests {
         TestPokerGameEventCommonData (evt1, evt2);
     }
 
+    [Test]
+    public void PokerData_TableGatherWagersEventConversion_Test () {
+        TableGatherWagersGameEvent evt1 = new () {
+            gameTableID = 9193821,
+            newCashPot = 17000,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableGatherWagers (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_GATHER_WAGERS);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.newCashPot, evt2.newCashPot);
+    }
+
+    [Test]
+    public void PokerData_AllPlayerCardsRevealEventConversion_Test () {
+        Dictionary<Int32, IReadOnlyList<PokerCard>> revealedHands = new () {
+            {
+                19323,
+                new List<PokerCard> () { PokerCard.CARD_2_C, PokerCard.CARD_6_C }
+            },
+            {
+                594332,
+                new List<PokerCard> () { PokerCard.CARD_J_H, PokerCard.CARD_9_S }
+            },
+            {
+                151192,
+                new List<PokerCard> () { PokerCard.CARD_Q_H, PokerCard.CARD_A_D }
+            },
+            {
+                98784,
+                new List<PokerCard> () { PokerCard.CARD_7_D, PokerCard.CARD_K_C }
+            },
+            {
+                8463,
+                new List<PokerCard> () { PokerCard.CARD_8_C, PokerCard.CARD_A_C }
+            }
+        };
+
+        AllPlayerCardsRevealGameEvent evt1 = new () {
+            gameTableID = 9193821,
+            revealedHands = revealedHands,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE +
+            (evt1.revealedHands.Count * ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER);
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAllPlayerCardsReveal (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAllPlayerCardsReveal (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.revealedHands.Count, evt2.revealedHands.Count);
+        foreach (var kvp in evt1.revealedHands) {
+            Assert.IsTrue (evt2.revealedHands.TryGetValue (kvp.Key, out var value2));
+            Assert.IsTrue (ListUtils.CheckEquals (kvp.Value, value2));
+        }
+    }
+
+    [Test]
+    public void PokerData_PlayerWinEventConversion_Test () {
+        PlayerWinGameEvent evt1 = new () {
+            gameTableID = 9193821,
+            playerID = 22342,
+            chipsWon = 100000,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_WIN;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerWin (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_WIN);
+
+        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerWin (evtBytes, out var evt2), expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+        Assert.AreEqual (evt1.chipsWon, evt2.chipsWon);
+    }
 }

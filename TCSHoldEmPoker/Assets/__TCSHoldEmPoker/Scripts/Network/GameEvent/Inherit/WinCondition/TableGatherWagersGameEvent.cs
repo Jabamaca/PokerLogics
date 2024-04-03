@@ -1,3 +1,4 @@
+using System;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {
@@ -5,7 +6,7 @@ namespace TCSHoldEmPoker.Network.Events {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.TABLE_GATHER_WAGERS;
 
-        public int newCashPot;
+        public Int32 newCashPot;
 
     }
 }

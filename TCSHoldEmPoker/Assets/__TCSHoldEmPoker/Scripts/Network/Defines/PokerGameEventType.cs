@@ -9,7 +9,7 @@ namespace TCSHoldEmPoker.Network.Define {
         PLAYER_JOIN                     = 0x0001,
         PLAYER_LEAVE                    = 0x0002,
 
-        // Game Progression Events
+        // Ante Progression Events
         ANTE_START                      = 0x0003,
         ANTE_PHASE_CHANGE               = 0x0004,
         ANTE_TURN_CHANGE                = 0x0005,

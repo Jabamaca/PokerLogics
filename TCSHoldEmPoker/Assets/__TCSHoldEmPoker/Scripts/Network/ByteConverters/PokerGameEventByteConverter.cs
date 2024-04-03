@@ -66,6 +66,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return returnBytes;
         }
 
+        #region Connectivity Game Events Conversion
+
         // PLAYER JOIN
 
         public static int BytesToPokerGameEventPlayerJoin (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
@@ -137,85 +139,9 @@ namespace TCSHoldEmPoker.Network.Data {
                 });
         }
 
-        // PLAYER CARD DEAL
+        #endregion
 
-        public static int BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerDealCardUniqueDataProcess, startIndex);
-        }
-
-        private static int PokerGameEventPlayerDealCardUniqueDataProcess (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
-            // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
-            // Player Cards
-            List<PokerCard> cards = new ();
-            for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                cards.Add (GameModelByteConverter.ByteToPokerCard (bytes[i]));
-                i += ByteConverterUtils.SIZEOF_CARD_DATA;
-            }
-
-            evt = new () {
-                playerID = playerID,
-                cards = cards,
-            };
-            return i;
-        }
-
-        public static byte[] BytesFromPokerGameEventPlayerCardDeal (PlayerCardsDealGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL;
-            return BytesFromPokerGameEvent (evt, eventSize,
-                uniqueDataProcess: (evt) => {
-                    List<byte> uniqueByteList = new ();
-
-                    // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
-                    // Player Cards
-                    foreach (var card in evt.cards)
-                        uniqueByteList.Add (GameModelByteConverter.ByteFromPokerCard (card));
-
-                    return uniqueByteList;
-                });
-        }
-
-        // COMMUNITY CARD DEAL
-
-        public static int BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventCommunityCardDealUniqueDataProcess, startIndex);
-        }
-
-        private static int PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
-            // Revealed Card
-            PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
-            i += ByteConverterUtils.SIZEOF_CARD_DATA;
-            // Community Card Index
-            Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
-            i += sizeof (Int16);
-
-            evt = new () {
-                pokerCard = card,
-                cardIndex = cardIndex,
-            };
-            return i;
-        }
-
-        public static byte[] BytesFromPokerGameEventCommunityCardDeal (CommunityCardDealGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
-            return BytesFromPokerGameEvent (evt, eventSize,
-                uniqueDataProcess: (evt) => {
-                    List<byte> uniqueByteList = new () {
-                        // Revealed Card
-                        GameModelByteConverter.ByteFromPokerCard (evt.pokerCard)
-                    };
-                    // Community Card Index
-                    foreach (byte cardIndexByte in BitConverter.GetBytes (evt.cardIndex))
-                        uniqueByteList.Add (cardIndexByte);
-
-                    return uniqueByteList;
-                });
-        }
+        #region Ante Progression Game Events Conversion
 
         // ANTE START
 
@@ -327,6 +253,221 @@ namespace TCSHoldEmPoker.Network.Data {
                     return uniqueByteList;
                 });
         }
+
+        #endregion
+
+        #region Card Dealing Game Events Conversion
+
+        // PLAYER CARD DEAL
+
+        public static int BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerDealCardUniqueDataProcess, startIndex);
+        }
+
+        private static int PokerGameEventPlayerDealCardUniqueDataProcess (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Player ID
+            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Player Cards
+            List<PokerCard> cards = new ();
+            for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
+                cards.Add (GameModelByteConverter.ByteToPokerCard (bytes[i]));
+                i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            }
+
+            evt = new () {
+                playerID = playerID,
+                cards = cards,
+            };
+            return i;
+        }
+
+        public static byte[] BytesFromPokerGameEventPlayerCardDeal (PlayerCardsDealGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL;
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+
+                    // Player ID
+                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
+                        uniqueByteList.Add (playerIDByte);
+                    // Player Cards
+                    foreach (var card in evt.cards)
+                        uniqueByteList.Add (GameModelByteConverter.ByteFromPokerCard (card));
+
+                    return uniqueByteList;
+                });
+        }
+
+        // COMMUNITY CARD DEAL
+
+        public static int BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventCommunityCardDealUniqueDataProcess, startIndex);
+        }
+
+        private static int PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Revealed Card
+            PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
+            i += ByteConverterUtils.SIZEOF_CARD_DATA;
+            // Community Card Index
+            Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
+            i += sizeof (Int16);
+
+            evt = new () {
+                pokerCard = card,
+                cardIndex = cardIndex,
+            };
+            return i;
+        }
+
+        public static byte[] BytesFromPokerGameEventCommunityCardDeal (CommunityCardDealGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new () {
+                        // Revealed Card
+                        GameModelByteConverter.ByteFromPokerCard (evt.pokerCard)
+                    };
+                    // Community Card Index
+                    foreach (byte cardIndexByte in BitConverter.GetBytes (evt.cardIndex))
+                        uniqueByteList.Add (cardIndexByte);
+
+                    return uniqueByteList;
+                });
+        }
+
+        #endregion
+
+        #region Win Condition Game Events Conversion
+
+        // TABLE GATHER WAGERS
+
+        public static int BytesToPokerGameEventTableGatherWagers (byte[] bytes, out TableGatherWagersGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventTableGatherWagersUniqueDataProcess, startIndex);
+        }
+
+        private static int PokerGameEventTableGatherWagersUniqueDataProcess (byte[] bytes, out TableGatherWagersGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // New Cash Pot
+            Int32 newCashPot = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+
+            evt = new () {
+                newCashPot = newCashPot,
+            };
+            return i;
+        }
+
+        public static byte[] BytesFromPokerGameEventTableGatherWagers (TableGatherWagersGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS;
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // New Cash Pot
+                    foreach (byte newCashPotByte in BitConverter.GetBytes (evt.newCashPot))
+                        uniqueByteList.Add (newCashPotByte);
+
+                    return uniqueByteList;
+                });
+        }
+
+        // ALL PLAYER CARDS REVEAL
+
+        public static int BytesToPokerGameEventAllPlayerCardsReveal (byte[] bytes, out AllPlayerCardsRevealGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAllPlayerCardsRevealUniqueDataProcess, startIndex);
+        }
+
+        private static int PokerGameEventAllPlayerCardsRevealUniqueDataProcess (byte[] bytes, out AllPlayerCardsRevealGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Participating Player Count
+            Int16 playerCount = BitConverter.ToInt16 (bytes, startIndex: i);
+            i += sizeof (Int16);
+            // Revealed Player Hands
+            Dictionary<Int32, IReadOnlyList<PokerCard>> revealedHands = new ();
+            for (int p = 0; p < playerCount; p++) {
+                // Player ID (KEY)
+                Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+                i += sizeof (Int32);
+                // Player Cards (VALUE)
+                List<PokerCard> cards = new ();
+                for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
+                    PokerCard card = GameModelByteConverter.ByteToPokerCard (bytes[i]);
+                    i += ByteConverterUtils.SIZEOF_CARD_DATA;
+                    cards.Add (card);
+                }
+                revealedHands.Add (playerID, cards);
+            }
+
+            evt = new () {
+                revealedHands = revealedHands,
+            };
+            return i;
+        }
+
+        public static byte[] BytesFromPokerGameEventAllPlayerCardsReveal (AllPlayerCardsRevealGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE +
+                (evt.revealedHands.Count * ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER);
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // Participating Player Count
+                    foreach (byte playerCountByte in BitConverter.GetBytes ((Int16)evt.revealedHands.Count))
+                        uniqueByteList.Add (playerCountByte);
+                    // Revealed Player Hands
+                    foreach (var kvp in evt.revealedHands) {
+                        // Player ID (KEY)
+                        foreach (byte playerIDByte in BitConverter.GetBytes (kvp.Key))
+                            uniqueByteList.Add (playerIDByte);
+                        // Player Cards (VALUE)
+                        foreach (var card in kvp.Value)
+                            uniqueByteList.Add (GameModelByteConverter.ByteFromPokerCard (card));
+                    }
+
+                    return uniqueByteList;
+                });
+        }
+
+        // PLAYER WIN
+
+        public static int BytesToPokerGameEventPlayerWin (byte[] bytes, out PlayerWinGameEvent evt, int startIndex = 0) {
+            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerWinUniqueDataProcess, startIndex);
+        }
+
+        private static int PokerGameEventPlayerWinUniqueDataProcess (byte[] bytes, out PlayerWinGameEvent evt, int startIndex = 0) {
+            int i = startIndex;
+            // Player ID
+            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+            // Chips Won
+            Int32 chipsWon = BitConverter.ToInt32 (bytes, startIndex: i);
+            i += sizeof (Int32);
+
+            evt = new () {
+                playerID = playerID,
+                chipsWon = chipsWon,
+            };
+            return i;
+        }
+
+        public static byte[] BytesFromPokerGameEventPlayerWin (PlayerWinGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_WIN;
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // Player ID
+                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
+                        uniqueByteList.Add (playerIDByte);
+                    // Chips Won
+                    foreach (byte chipsWonByte in BitConverter.GetBytes (evt.chipsWon))
+                        uniqueByteList.Add (chipsWonByte);
+
+                    return uniqueByteList;
+                });
+        }
+
+        #endregion
 
         #endregion
 
