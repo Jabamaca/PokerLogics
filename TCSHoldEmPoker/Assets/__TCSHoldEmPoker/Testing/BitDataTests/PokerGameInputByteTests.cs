@@ -1,12 +1,8 @@
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using GameUtils;
-using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Inputs;
-using TCSHoldEmPoker.Network.Events;
 
 public class PokerGameInputByteTests {
 
@@ -35,13 +31,13 @@ public class PokerGameInputByteTests {
             buyInChips = 500000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_JOIN_REQUEST;
-        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerJoinRequest (input1);
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_JOIN;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerRequestJoin (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_REQUEST_JOIN);
 
         int currentDataIndex = 0;
-        PokerGameInputByteConverted.BytesToPokerGameInputPlayerJoinRequest (inputBytes, ref currentDataIndex, out var input2);
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerRequestJoin (inputBytes, ref currentDataIndex, out var input2);
         Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameInputCommonData (input1, input2);
         Assert.AreEqual (input1.buyInChips, input2.buyInChips);
@@ -54,13 +50,87 @@ public class PokerGameInputByteTests {
             playerID = 222,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_LEAVE_REQUEST;
-        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerLeaveRequest (input1);
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerRequestLeave (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE);
 
         int currentDataIndex = 0;
-        PokerGameInputByteConverted.BytesToPokerGameInputPlayerLeaveRequest (inputBytes, ref currentDataIndex, out var input2);
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerRequestLeave (inputBytes, ref currentDataIndex, out var input2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameInputCommonData (input1, input2);
+    }
+
+    [Test]
+    public void PokerData_PlayerActionBetCheckInputConversion_Test () {
+        PlayerBetCheckActionGameInput input1 = new () {
+            gameTableID = 85311,
+            playerID = 8999,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerActionBetCheck (input1);
+        TestPokerGameInputByteArray (inputBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK);
+
+        int currentDataIndex = 0;
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerActionBetCheck (inputBytes, ref currentDataIndex, out var input2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameInputCommonData (input1, input2);
+    }
+
+    [Test]
+    public void PokerData_PlayerActionBetCallInputConversion_Test () {
+        PlayerBetCallActionGameInput input1 = new () {
+            gameTableID = 13165,
+            playerID = 9096,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerActionBetCall (input1);
+        TestPokerGameInputByteArray (inputBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL);
+
+        int currentDataIndex = 0;
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerActionBetCall (inputBytes, ref currentDataIndex, out var input2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameInputCommonData (input1, input2);
+    }
+
+    [Test]
+    public void PokerData_PlayerActionBetRaiseInputConversion_Test () {
+        PlayerBetRaiseActionGameInput input1 = new () {
+            gameTableID = 66331,
+            playerID = 6969,
+            newStake = 70000,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerActionBetRaise (input1);
+        TestPokerGameInputByteArray (inputBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE);
+
+        int currentDataIndex = 0;
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerActionBetRaise (inputBytes, ref currentDataIndex, out var input2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameInputCommonData (input1, input2);
+        Assert.AreEqual (input1.newStake, input2.newStake);
+    }
+
+    [Test]
+    public void PokerData_PlayerActionBetFoldInputConversion_Test () {
+        PlayerBetFoldActionGameInput input1 = new () {
+            gameTableID = 66331,
+            playerID = 6969,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD;
+        byte[] inputBytes = PokerGameInputByteConverted.BytesFromPokerGameInputPlayerActionBetFold (input1);
+        TestPokerGameInputByteArray (inputBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD);
+
+        int currentDataIndex = 0;
+        PokerGameInputByteConverted.BytesToPokerGameInputPlayerActionBetFold (inputBytes, ref currentDataIndex, out var input2);
         Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameInputCommonData (input1, input2);
     }

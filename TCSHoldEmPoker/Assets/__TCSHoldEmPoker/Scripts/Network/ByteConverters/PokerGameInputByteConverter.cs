@@ -68,11 +68,11 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER JOIN REQUEST
 
-        public static void BytesToPokerGameInputPlayerJoinRequest (byte[] bytes, ref int currentDataIndex, out PlayerJoinRequestGameInput input) {
-            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerJoinRequestUniqueDataProcess, out input);
+        public static void BytesToPokerGameInputPlayerRequestJoin (byte[] bytes, ref int currentDataIndex, out PlayerJoinRequestGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerRequestJoinUniqueDataProcess, out input);
         }
 
-        private static void PokerGameInputPlayerJoinRequestUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerJoinRequestGameInput input) {
+        private static void PokerGameInputPlayerRequestJoinUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerJoinRequestGameInput input) {
             // Buy-In Chips
             ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var buyInChips);
 
@@ -81,13 +81,13 @@ namespace TCSHoldEmPoker.Network.Data {
             };
         }
 
-        public static byte[] BytesFromPokerGameInputPlayerJoinRequest (PlayerJoinRequestGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_JOIN_REQUEST;
+        public static byte[] BytesFromPokerGameInputPlayerRequestJoin (PlayerJoinRequestGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_JOIN;
             return BytesFromPokerGameInput (input, eventSize,
-                uniqueDataProcess: (evt) => {
+                uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();
                     // Buy-In Chips
-                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.buyInChips));
+                    uniqueByteList.AddRange (BitConverter.GetBytes (input.buyInChips));
 
                     return uniqueByteList;
                 });
@@ -95,20 +95,20 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER LEAVE REQUEST
 
-        public static void BytesToPokerGameInputPlayerLeaveRequest (byte[] bytes, ref int currentDataIndex, out PlayerLeaveRequestGameInput input) {
-            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerLeaveRequestUniqueDataProcess, out input);
+        public static void BytesToPokerGameInputPlayerRequestLeave (byte[] bytes, ref int currentDataIndex, out PlayerLeaveRequestGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerRequestLeaveUniqueDataProcess, out input);
         }
 
-        private static void PokerGameInputPlayerLeaveRequestUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerLeaveRequestGameInput input) {
+        private static void PokerGameInputPlayerRequestLeaveUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerLeaveRequestGameInput input) {
             // NO UNIQUE DATA
 
             input = new ();
         }
 
-        public static byte[] BytesFromPokerGameInputPlayerLeaveRequest (PlayerLeaveRequestGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_LEAVE_REQUEST;
+        public static byte[] BytesFromPokerGameInputPlayerRequestLeave (PlayerLeaveRequestGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE;
             return BytesFromPokerGameInput (input, eventSize,
-                uniqueDataProcess: (evt) => {
+                uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();
                     // NO UNIQUE DATA
 
@@ -120,7 +120,101 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Player Action Game Input Conversion
 
+        // PLAYER ACTION BET CHECK
 
+        public static void BytesToPokerGameInputPlayerActionBetCheck (byte[] bytes, ref int currentDataIndex, out PlayerBetCheckActionGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerActionBetCheckUniqueDataProcess, out input);
+        }
+
+        private static void PokerGameInputPlayerActionBetCheckUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetCheckActionGameInput input) {
+            // NO UNIQUE DATA
+
+            input = new ();
+        }
+
+        public static byte[] BytesFromPokerGameInputPlayerActionBetCheck (PlayerBetCheckActionGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK;
+            return BytesFromPokerGameInput (input, eventSize,
+                uniqueDataProcess: (input) => {
+                    List<byte> uniqueByteList = new ();
+                    // NO UNIQUE DATA
+
+                    return uniqueByteList;
+                });
+        }
+
+        // PLAYER ACTION BET CALL
+
+        public static void BytesToPokerGameInputPlayerActionBetCall (byte[] bytes, ref int currentDataIndex, out PlayerBetCallActionGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerActionBetCallUniqueDataProcess, out input);
+        }
+
+        private static void PokerGameInputPlayerActionBetCallUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetCallActionGameInput input) {
+            // NO UNIQUE DATA
+
+            input = new ();
+        }
+
+        public static byte[] BytesFromPokerGameInputPlayerActionBetCall (PlayerBetCallActionGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL;
+            return BytesFromPokerGameInput (input, eventSize,
+                uniqueDataProcess: (input) => {
+                    List<byte> uniqueByteList = new ();
+                    // NO UNIQUE DATA
+
+                    return uniqueByteList;
+                });
+        }
+
+        // PLAYER ACTION BET RAISE
+
+        public static void BytesToPokerGameInputPlayerActionBetRaise (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseActionGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerActionBetRaiseUniqueDataProcess, out input);
+        }
+
+        private static void PokerGameInputPlayerActionBetRaiseUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseActionGameInput input) {
+            // New Stake
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var newStake);
+
+            input = new () {
+                newStake = newStake,
+            };
+        }
+
+        public static byte[] BytesFromPokerGameInputPlayerActionBetRaise (PlayerBetRaiseActionGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE;
+            return BytesFromPokerGameInput (input, eventSize,
+                uniqueDataProcess: (input) => {
+                    List<byte> uniqueByteList = new ();
+                    // Buy-In Chips
+                    uniqueByteList.AddRange (BitConverter.GetBytes (input.newStake));
+
+                    return uniqueByteList;
+                });
+        }
+
+        // PLAYER ACTION BET FOLD
+
+        public static void BytesToPokerGameInputPlayerActionBetFold (byte[] bytes, ref int currentDataIndex, out PlayerBetFoldActionGameInput input) {
+            BytesToPokerGameInput (bytes, ref currentDataIndex, PokerGameInputPlayerActionBetFoldUniqueDataProcess, out input);
+        }
+
+        private static void PokerGameInputPlayerActionBetFoldUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetFoldActionGameInput input) {
+            // NO UNIQUE DATA
+
+            input = new ();
+        }
+
+        public static byte[] BytesFromPokerGameInputPlayerActionBetFold (PlayerBetFoldActionGameInput input) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD;
+            return BytesFromPokerGameInput (input, eventSize,
+                uniqueDataProcess: (input) => {
+                    List<byte> uniqueByteList = new ();
+                    // NO UNIQUE DATA
+
+                    return uniqueByteList;
+                });
+        }
 
         #endregion
 

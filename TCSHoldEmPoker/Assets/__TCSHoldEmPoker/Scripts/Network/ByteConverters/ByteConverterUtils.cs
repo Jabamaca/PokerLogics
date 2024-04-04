@@ -117,19 +117,19 @@ namespace TCSHoldEmPoker.Network.Data {
             /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                             // *** UNIQUE DATA (If Any) ***
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
         // Connectivity
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_JOIN_REQUEST =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_JOIN =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA +                                   // Input Data Signature and Common Data
             sizeof (Int32);                                                         // Buy-In Chips
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_LEAVE_REQUEST =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_BET_CHECK_ACTION =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_BET_CALL_ACTION =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_BET_RAISE_ACTION =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA +                                   // Input Data Signature and Common Data
             sizeof (Int32);                                                         // New Stake
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_BET_FOLD_ACTION =
+        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
 
         public const int BIT_COUNT_OF_BYTE = 8;
