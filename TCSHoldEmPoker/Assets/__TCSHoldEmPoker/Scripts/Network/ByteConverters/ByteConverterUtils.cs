@@ -135,34 +135,45 @@ namespace TCSHoldEmPoker.Network.Data {
             return result;
         }
 
-        internal static int AddBytesToArray (IEnumerable<byte> bytesToAdd, byte[] bytesLocation, int startIndex = 0) {
-            int i = startIndex;
+        internal static void AddBytesToArray (IEnumerable<byte> bytesToAdd, byte[] bytesLocation, ref int currentDataIndex) {
             foreach (byte byteToAdd in bytesToAdd) {
-                bytesLocation[i] = byteToAdd;
-                i++;
+                bytesLocation[currentDataIndex] = byteToAdd;
+                currentDataIndex++;
             }
-            return i;
         }
 
-        internal static int AddByteToArray (byte byteToAdd, byte[] bytesLocation, int startIndex = 0) {
-            int i = startIndex;
-            bytesLocation[i] = byteToAdd;
-            i++;
-            return i;
+        internal static void AddByteToArray (byte byteToAdd, byte[] bytesLocation, ref int currentDataIndex) {
+            bytesLocation[currentDataIndex] = byteToAdd;
+            currentDataIndex++;
         }
 
-        internal static int BytesToInt32 (byte[] bytes, out Int32 outValue, int startIndex = 0) {
-            int i = startIndex;
-            outValue = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
-            return i;
+        internal static void BytesToBoolArray (byte[] bytes, int byteCount, ref int currentDataIndex, out bool[] boolArray) {
+            if (byteCount <= 0) {
+                boolArray = new bool[0];
+                return;
+            }
+
+            boolArray = new bool[BIT_COUNT_OF_BYTE * byteCount];
+            int boolIndex = 0;
+
+            for (int i = 0; i < byteCount; i++) {
+                byte boolByte = bytes[currentDataIndex];
+                foreach (bool b in ByteConverterUtils.BoolArrayFromByte (boolByte)) {
+                    boolArray[boolIndex] = b;
+                    boolIndex++;
+                }
+                currentDataIndex++;
+            }
         }
 
-        internal static int BytesToInt16 (byte[] bytes, out Int16 outValue, int startIndex = 0) {
-            int i = startIndex;
-            outValue = BitConverter.ToInt16 (bytes, startIndex: i);
-            i += sizeof (Int16);
-            return i;
+        internal static void BytesToInt32 (byte[] bytes, ref int currentDataIndex, out Int32 outValue) {
+            outValue = BitConverter.ToInt32 (bytes, startIndex: currentDataIndex);
+            currentDataIndex += sizeof (Int32);
+        }
+
+        internal static void BytesToInt16 (byte[] bytes, ref int currentDataIndex, out Int16 outValue) {
+            outValue = BitConverter.ToInt16 (bytes, startIndex: currentDataIndex);
+            currentDataIndex += sizeof (Int16);
         }
     }
 }

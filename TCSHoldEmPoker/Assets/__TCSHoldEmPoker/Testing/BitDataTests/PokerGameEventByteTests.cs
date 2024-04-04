@@ -6,6 +6,7 @@ using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Events;
+using System.ComponentModel;
 
 public class PokerGameEventByteTests {
 
@@ -38,7 +39,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_JOIN);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerJoin (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerJoin (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.buyInChips, evt2.buyInChips);
@@ -56,7 +59,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_LEAVE);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerLeave (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerLeave (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
     }
@@ -79,7 +84,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_CARD_DEAL);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerCardDeal (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerCardDeal (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.IsTrue (ListUtils.CheckEquals (evt1.cards, evt2.cards));
@@ -98,7 +105,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_COMMUNITY_CARD_DEAL);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventCommunityCardDeal (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventCommunityCardDeal (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.pokerCard, evt2.pokerCard);
         Assert.AreEqual (evt1.cardIndex, evt2.cardIndex);
@@ -115,7 +124,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_START);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
     }
 
@@ -131,7 +142,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_PHASE_CHANGE);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAntePhaseChange (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventAntePhaseChange (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.gamePhase, evt2.gamePhase);
     }
@@ -147,7 +160,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_TURN_CHANGE);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteTurnChange (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventAnteTurnChange (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.seatIndex, evt2.seatIndex);
     }
@@ -163,7 +178,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_END);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAnteEnd (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventAnteEnd (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
     }
 
@@ -179,7 +196,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_GATHER_WAGERS);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.newCashPot, evt2.newCashPot);
     }
@@ -220,7 +239,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventAllPlayerCardsReveal (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventAllPlayerCardsReveal (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.revealedHands.Count, evt2.revealedHands.Count);
         foreach (var kvp in evt1.revealedHands) {
@@ -242,7 +263,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_WIN);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerWin (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerWin (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsWon, evt2.chipsWon);
@@ -261,7 +284,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_BLIND);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetBlind (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetBlind (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
@@ -279,7 +304,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CHECK);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCheck (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCheck (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
     }
@@ -296,7 +323,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_FOLD);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetFold (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetFold (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
     }
@@ -315,7 +344,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_BASIC);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallBasic (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallBasic (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
@@ -336,7 +367,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_ALL_IN);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallAllIn (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallAllIn (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
@@ -357,7 +390,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_BASIC);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseBasic (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseBasic (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);
@@ -378,7 +413,9 @@ public class PokerGameEventByteTests {
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_ALL_IN);
 
-        Assert.AreEqual (PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseAllIn (evtBytes, out var evt2), expectedSize);
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseAllIn (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
         Assert.AreEqual (evt1.chipsSpent, evt2.chipsSpent);

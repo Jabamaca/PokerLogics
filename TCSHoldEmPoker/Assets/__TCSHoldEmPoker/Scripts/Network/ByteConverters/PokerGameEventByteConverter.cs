@@ -8,60 +8,48 @@ using TCSHoldEmPoker.Network.Events;
 namespace TCSHoldEmPoker.Network.Data {
     public static class PokerGameEventByteConverter {
 
-        private delegate int UniqueEventDataProcess<EVT> (byte[] bytes, out EVT evt, int startIndex = 0) where EVT : PokerGameEvent;
+        private delegate void UniqueDataToEventProcess<EVT> (byte[] bytes, ref int currentDataIndex, out EVT evt) where EVT : PokerGameEvent;
+        private delegate IReadOnlyList<byte> UniqueDataFromEventProcess<EVT> (EVT evt) where EVT : PokerGameEvent;
 
         #region Methods
 
-        private static int BytesToPokerGameEvent<EVT> (byte[] bytes, out EVT evt, UniqueEventDataProcess<EVT> uniqueDataProcess, int startIndex = 0) 
+        private static void BytesToPokerGameEvent<EVT> (byte[] bytes, ref int currentDataIndex, UniqueDataToEventProcess<EVT> uniqueDataProcess, out EVT evt) 
             where EVT : PokerGameEvent {
 
-            int i = startIndex;
             // COMMON DATA
-            i += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;      // START of Network Activity Signature
-            i += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_ID;         // Network Activity ID
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;      // START of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_ID;         // Network Activity ID
             // Game Table ID
-            Int32 gameTableID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var gameTableID);
 
-            i = uniqueDataProcess (bytes, out evt, startIndex: i);
+            uniqueDataProcess (bytes, ref currentDataIndex, out evt);
             evt.gameTableID = gameTableID;
-            i += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
-            return i;
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
         }
 
-        private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, Func<EVT, List<byte>> uniqueDataProcess) where EVT : PokerGameEvent {
+        private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, UniqueDataFromEventProcess<EVT> uniqueDataProcess) where EVT : PokerGameEvent {
             if (evt == null)
                 return null;
 
             byte[] returnBytes = new byte[eventSize];
 
-            int i = 0;
+            int currentDataIndex = 0;
             // Network Activity START Signature
-            foreach (byte startByte in BitConverter.GetBytes (ByteConverterUtils.NETWORK_ACTIVITY_START)) {
-                returnBytes[i] = startByte;
-                i++;
-            }
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: BitConverter.GetBytes (ByteConverterUtils.NETWORK_ACTIVITY_START),
+                bytesLocation: returnBytes, ref currentDataIndex);
             // Network Activity ID
             Int16 netWorkActivityID = (Int16)((Int16)NetworkActivityID.POKER_GAME_EVENT_PREFIX | (Int16)evt.GameEventType);
-            foreach (byte nIDByte in BitConverter.GetBytes (netWorkActivityID)) {
-                returnBytes[i] = nIDByte;
-                i++;
-            }
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: BitConverter.GetBytes (netWorkActivityID),
+                bytesLocation: returnBytes, ref currentDataIndex);
             // Game Table ID
-            foreach (byte tableStakeByte in BitConverter.GetBytes (evt.gameTableID)) {
-                returnBytes[i] = tableStakeByte;
-                i++;
-            }
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: BitConverter.GetBytes (evt.gameTableID),
+                bytesLocation: returnBytes, ref currentDataIndex);
             // Unique Data
-            foreach (byte uniqueByte in uniqueDataProcess (evt)) {
-                returnBytes[i] = uniqueByte;
-                i++;
-            }
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: uniqueDataProcess (evt),
+                bytesLocation: returnBytes, ref currentDataIndex);
             // Network Activity END Signature
-            foreach (byte startByte in BitConverter.GetBytes (ByteConverterUtils.NETWORK_ACTIVITY_END)) {
-                returnBytes[i] = startByte;
-                i++;
-            }
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: BitConverter.GetBytes (ByteConverterUtils.NETWORK_ACTIVITY_END),
+                bytesLocation: returnBytes, ref currentDataIndex);
 
             return returnBytes;
         }
@@ -70,24 +58,20 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER JOIN
 
-        public static int BytesToPokerGameEventPlayerJoin (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerJoinUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerJoin (byte[] bytes, ref int currentDataIndex, out PlayerJoinGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerJoinUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerJoinUniqueDataProcess (byte[] bytes, out PlayerJoinGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerJoinUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerJoinGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Buy-In Chips
-            Int32 buyInChips = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var buyInChips);
 
             evt = new () {
                 playerID = playerID,
                 buyInChips = buyInChips,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerJoin (PlayerJoinGameEvent evt) {
@@ -95,13 +79,10 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Buy-In Chips
-                    foreach (byte chipsByte in BitConverter.GetBytes (evt.buyInChips))
-                        uniqueByteList.Add (chipsByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.buyInChips));
 
                     return uniqueByteList;
                 });
@@ -109,20 +90,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER LEAVE
 
-        public static int BytesToPokerGameEventPlayerLeave (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerLeaveUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerLeave (byte[] bytes, ref int currentDataIndex, out PlayerLeaveGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerLeaveUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerLeaveUniqueDataProcess (byte[] bytes, out PlayerLeaveGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerLeaveUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerLeaveGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
 
             evt = new () {
                 playerID = playerID,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerLeave (PlayerLeaveGameEvent evt) {
@@ -130,10 +108,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
 
                     return uniqueByteList;
                 });
@@ -145,16 +121,14 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE START
 
-        public static int BytesToPokerGameEventAnteStart (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteStartUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventAnteStart (byte[] bytes, ref int currentDataIndex, out AnteStartGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventAnteStartUniqueDataProcess, out evt);
         }
 
-        public static int PokerGameEventAnteStartUniqueDataProcess (byte[] bytes, out AnteStartGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        public static void PokerGameEventAnteStartUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out AnteStartGameEvent evt) {
             // NO UNIQUE DATA
 
             evt = new ();
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteStart (AnteStartGameEvent evt) {
@@ -163,26 +137,24 @@ namespace TCSHoldEmPoker.Network.Data {
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // NO UNIQUE DATA
+
                     return uniqueByteList;
                 });
         }
 
         // ANTE PHASE CHANGE
 
-        public static int BytesToPokerGameEventAntePhaseChange (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAntePhaseChangeUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventAntePhaseChange (byte[] bytes, ref int currentDataIndex, out GamePhaseChangeGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventAntePhaseChangeUniqueDataProcess, out evt);
         }
 
-        public static int PokerGameEventAntePhaseChangeUniqueDataProcess (byte[] bytes, out GamePhaseChangeGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        public static void PokerGameEventAntePhaseChangeUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out GamePhaseChangeGameEvent evt) {
             // New Game Phase
-            PokerGamePhaseEnum newGamePhase = (PokerGamePhaseEnum)bytes[i];
-            i += ByteConverterUtils.SIZEOF_GAME_PHASE;
+            GameModelByteConverter.BytesToGamePhase (bytes, ref currentDataIndex, out var newGamePhase);
 
             evt = new () {
                 gamePhase = newGamePhase,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAntePhaseChange (GamePhaseChangeGameEvent evt) {
@@ -200,20 +172,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE TURN CHANGE
 
-        public static int BytesToPokerGameEventAnteTurnChange (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteTurnChangeUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventAnteTurnChange (byte[] bytes, ref int currentDataIndex, out ChangeTurnSeatIndexGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventAnteTurnChangeUniqueDataProcess, out evt);
         }
 
-        public static int PokerGameEventAnteTurnChangeUniqueDataProcess (byte[] bytes, out ChangeTurnSeatIndexGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        public static void PokerGameEventAnteTurnChangeUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out ChangeTurnSeatIndexGameEvent evt) {
             // Turning Seat Index
-            Int16 seatIndex = BitConverter.ToInt16 (bytes, startIndex: i);
-            i += sizeof (Int16);
+            ByteConverterUtils.BytesToInt16 (bytes, ref currentDataIndex, out var seatIndex);
 
             evt = new () {
                 seatIndex = seatIndex,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteTurnChange (ChangeTurnSeatIndexGameEvent evt) {
@@ -221,10 +190,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Turning Seat Index
-                    foreach (byte seatIndexByte in BitConverter.GetBytes (evt.seatIndex))
-                        uniqueByteList.Add (seatIndexByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.seatIndex));
 
                     return uniqueByteList;
                 });
@@ -232,16 +199,14 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ANTE END
 
-        public static int BytesToPokerGameEventAnteEnd (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAnteEndUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventAnteEnd (byte[] bytes, ref int currentDataIndex, out AnteEndGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventAnteEndUniqueDataProcess, out evt);
         }
 
-        public static int PokerGameEventAnteEndUniqueDataProcess (byte[] bytes, out AnteEndGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        public static void PokerGameEventAnteEndUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out AnteEndGameEvent evt) {
             // NO UNIQUE DATA
 
             evt = new ();
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAnteEnd (AnteEndGameEvent evt) {
@@ -250,6 +215,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // NO UNIQUE DATA
+
                     return uniqueByteList;
                 });
         }
@@ -260,19 +226,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER CARD DEAL
 
-        public static int BytesToPokerGameEventPlayerCardDeal (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerDealCardUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerCardDeal (byte[] bytes, ref int currentDataIndex, out PlayerCardsDealGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerDealCardUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerDealCardUniqueDataProcess (byte[] bytes, out PlayerCardsDealGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerDealCardUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerCardsDealGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Player Cards
             List<PokerCard> cards = new ();
             for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
+                GameModelByteConverter.BytesToPokerCard (bytes, ref currentDataIndex, out var card);
                 cards.Add (card);
             }
 
@@ -280,7 +244,6 @@ namespace TCSHoldEmPoker.Network.Data {
                 playerID = playerID,
                 cards = cards,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerCardDeal (PlayerCardsDealGameEvent evt) {
@@ -288,10 +251,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Player Cards
                     foreach (var card in evt.cards)
                         uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (card));
@@ -302,23 +263,20 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // COMMUNITY CARD DEAL
 
-        public static int BytesToPokerGameEventCommunityCardDeal (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventCommunityCardDealUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventCommunityCardDeal (byte[] bytes, ref int currentDataIndex, out CommunityCardDealGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventCommunityCardDealUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, out CommunityCardDealGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventCommunityCardDealUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out CommunityCardDealGameEvent evt) {
             // Revealed Card
-            i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
+            GameModelByteConverter.BytesToPokerCard (bytes, ref currentDataIndex, out var card);
             // Community Card Index
-            Int16 cardIndex = BitConverter.ToInt16 (bytes, startIndex: i);
-            i += sizeof (Int16);
+            ByteConverterUtils.BytesToInt16 (bytes, ref currentDataIndex, out var cardIndex);
 
             evt = new () {
                 pokerCard = card,
                 cardIndex = cardIndex,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventCommunityCardDeal (CommunityCardDealGameEvent evt) {
@@ -329,8 +287,7 @@ namespace TCSHoldEmPoker.Network.Data {
                     // Revealed Card
                     uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (evt.pokerCard));
                     // Community Card Index
-                    foreach (byte cardIndexByte in BitConverter.GetBytes (evt.cardIndex))
-                        uniqueByteList.Add (cardIndexByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.cardIndex));
 
                     return uniqueByteList;
                 });
@@ -342,24 +299,20 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER BET BLIND
 
-        public static int BytesToPokerGameEventPlayerBetBlind (byte[] bytes, out PlayerBetBlindGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetBlindUniqueDataProcess, startIndex);    
+        public static void BytesToPokerGameEventPlayerBetBlind (byte[] bytes, ref int currentDataIndex, out PlayerBetBlindGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetBlindUniqueDataProcess, out evt);    
         }
 
-        private static int PokerGameEventPlayerBetBlindUniqueDataProcess (byte[] bytes, out PlayerBetBlindGameEvent evt, int startIndex) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerBetBlindUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetBlindGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Chips Spent
-            Int32 chipsSpent = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var chipsSpent);
 
             evt = new () {
                 playerID = playerID,
                 chipsSpent = chipsSpent,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetBlind (PlayerBetBlindGameEvent evt) {
@@ -367,13 +320,10 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Chips Spent
-                    foreach (byte chipsSpentByte in BitConverter.GetBytes (evt.chipsSpent))
-                        uniqueByteList.Add (chipsSpentByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.chipsSpent));
 
                     return uniqueByteList;
                 });
@@ -381,20 +331,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER BET CHECK
 
-        public static int BytesToPokerGameEventPlayerBetCheck (byte[] bytes, out PlayerBetCheckGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetCheckUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerBetCheck (byte[] bytes, ref int currentDataIndex, out PlayerBetCheckGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetCheckUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerBetCheckUniqueDataProcess (byte[] bytes, out PlayerBetCheckGameEvent evt, int startIndex) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerBetCheckUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerBetCheckGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
 
             evt = new () {
                 playerID = playerID,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetCheck (PlayerBetCheckGameEvent evt) {
@@ -402,10 +349,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
 
                     return uniqueByteList;
                 });
@@ -413,37 +358,33 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER BET CALL
 
-        public static int BytesToPokerGameEventPlayerBetCallBasic (byte[] bytes, out PlayerBetCallGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetCallUniqueDataProcessBasic, startIndex);
+        public static void BytesToPokerGameEventPlayerBetCallBasic (byte[] bytes, ref int currentDataIndex, out PlayerBetCallGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetCallUniqueDataProcessBasic, out evt);
         }
 
-        public static int BytesToPokerGameEventPlayerBetCallAllIn (byte[] bytes, out PlayerBetCallGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetCallUniqueDataProcessAllIn, startIndex);
+        public static void BytesToPokerGameEventPlayerBetCallAllIn (byte[] bytes, ref int currentDataIndex, out PlayerBetCallGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetCallUniqueDataProcessAllIn, out evt);
         }
 
-        private static int PokerGameEventPlayerBetCallUniqueDataProcessBasic (byte[] bytes, out PlayerBetCallGameEvent evt, int startIndex) {
-            return PokerGameEventPlayerBetCallUniqueDataProcess (bytes, out evt, startIndex, isAllIn: false);
+        private static void PokerGameEventPlayerBetCallUniqueDataProcessBasic (byte[] bytes, ref int currentDataIndex, out PlayerBetCallGameEvent evt) {
+            PokerGameEventPlayerBetCallUniqueDataProcess (bytes, ref currentDataIndex, isAllIn: false, out evt);
         }
 
-        private static int PokerGameEventPlayerBetCallUniqueDataProcessAllIn (byte[] bytes, out PlayerBetCallGameEvent evt, int startIndex) {
-            return PokerGameEventPlayerBetCallUniqueDataProcess (bytes, out evt, startIndex, isAllIn: true);
+        private static void PokerGameEventPlayerBetCallUniqueDataProcessAllIn (byte[] bytes, ref int currentDataIndex, out PlayerBetCallGameEvent evt) {
+            PokerGameEventPlayerBetCallUniqueDataProcess (bytes, ref currentDataIndex, isAllIn: true, out evt);
         }
 
-        private static int PokerGameEventPlayerBetCallUniqueDataProcess (byte[] bytes, out PlayerBetCallGameEvent evt, int startIndex, bool isAllIn) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerBetCallUniqueDataProcess (byte[] bytes, ref int currentDataIndex, bool isAllIn, out PlayerBetCallGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Chips Spent
-            Int32 chipsSpent = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var chipsSpent);
 
             evt = new () {
                 playerID = playerID,
                 chipsSpent = chipsSpent,
                 isAllIn = isAllIn,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetCall (PlayerBetCallGameEvent evt) {
@@ -451,13 +392,10 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Chips Spent
-                    foreach (byte chipsSpentByte in BitConverter.GetBytes (evt.chipsSpent))
-                        uniqueByteList.Add (chipsSpentByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.chipsSpent));
 
                     return uniqueByteList;
                 });
@@ -465,37 +403,33 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER BET RAISE
 
-        public static int BytesToPokerGameEventPlayerBetRaiseBasic (byte[] bytes, out PlayerBetRaiseGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetRaiseUniqueDataProcessBasic, startIndex);
+        public static void BytesToPokerGameEventPlayerBetRaiseBasic (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetRaiseUniqueDataProcessBasic, out evt);
         }
 
-        public static int BytesToPokerGameEventPlayerBetRaiseAllIn (byte[] bytes, out PlayerBetRaiseGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetRaiseUniqueDataProcessAllIn, startIndex);
+        public static void BytesToPokerGameEventPlayerBetRaiseAllIn (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetRaiseUniqueDataProcessAllIn, out evt);
         }
 
-        private static int PokerGameEventPlayerBetRaiseUniqueDataProcessBasic (byte[] bytes, out PlayerBetRaiseGameEvent evt, int startIndex) {
-            return PokerGameEventPlayerBetRaiseUniqueDataProcess (bytes, out evt, startIndex, isAllIn: false);
+        private static void PokerGameEventPlayerBetRaiseUniqueDataProcessBasic (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseGameEvent evt) {
+            PokerGameEventPlayerBetRaiseUniqueDataProcess (bytes, ref currentDataIndex, isAllIn: false, out evt);
         }
 
-        private static int PokerGameEventPlayerBetRaiseUniqueDataProcessAllIn (byte[] bytes, out PlayerBetRaiseGameEvent evt, int startIndex) {
-            return PokerGameEventPlayerBetRaiseUniqueDataProcess (bytes, out evt, startIndex, isAllIn: true);
+        private static void PokerGameEventPlayerBetRaiseUniqueDataProcessAllIn (byte[] bytes, ref int currentDataIndex, out PlayerBetRaiseGameEvent evt) {
+            PokerGameEventPlayerBetRaiseUniqueDataProcess (bytes, ref currentDataIndex, isAllIn: true, out evt);
         }
 
-        private static int PokerGameEventPlayerBetRaiseUniqueDataProcess (byte[] bytes, out PlayerBetRaiseGameEvent evt, int startIndex, bool isAllIn) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerBetRaiseUniqueDataProcess (byte[] bytes, ref int currentDataIndex, bool isAllIn, out PlayerBetRaiseGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Chips Spent
-            Int32 chipsSpent = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var chipsSpent);
 
             evt = new () {
                 playerID = playerID,
                 chipsSpent = chipsSpent,
                 isAllIn = isAllIn,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetRaise (PlayerBetRaiseGameEvent evt) {
@@ -503,13 +437,10 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Chips Spent
-                    foreach (byte chipsSpentByte in BitConverter.GetBytes (evt.chipsSpent))
-                        uniqueByteList.Add (chipsSpentByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.chipsSpent));
 
                     return uniqueByteList;
                 });
@@ -517,20 +448,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER BET FOLD
 
-        public static int BytesToPokerGameEventPlayerBetFold (byte[] bytes, out PlayerFoldGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerBetFoldUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerBetFold (byte[] bytes, ref int currentDataIndex, out PlayerFoldGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerBetFoldUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerBetFoldUniqueDataProcess (byte[] bytes, out PlayerFoldGameEvent evt, int startIndex) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerBetFoldUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerFoldGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
 
             evt = new () {
                 playerID = playerID,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetFold (PlayerFoldGameEvent evt) {
@@ -538,10 +466,8 @@ namespace TCSHoldEmPoker.Network.Data {
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
-
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
 
                     return uniqueByteList;
                 });
@@ -553,20 +479,17 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // TABLE GATHER WAGERS
 
-        public static int BytesToPokerGameEventTableGatherWagers (byte[] bytes, out TableGatherWagersGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventTableGatherWagersUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventTableGatherWagers (byte[] bytes, ref int currentDataIndex, out TableGatherWagersGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventTableGatherWagersUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventTableGatherWagersUniqueDataProcess (byte[] bytes, out TableGatherWagersGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventTableGatherWagersUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out TableGatherWagersGameEvent evt) {
             // New Cash Pot
-            Int32 newCashPot = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var newCashPot);
 
             evt = new () {
                 newCashPot = newCashPot,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventTableGatherWagers (TableGatherWagersGameEvent evt) {
@@ -575,8 +498,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // New Cash Pot
-                    foreach (byte newCashPotByte in BitConverter.GetBytes (evt.newCashPot))
-                        uniqueByteList.Add (newCashPotByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.newCashPot));
 
                     return uniqueByteList;
                 });
@@ -584,25 +506,22 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // ALL PLAYER CARDS REVEAL
 
-        public static int BytesToPokerGameEventAllPlayerCardsReveal (byte[] bytes, out AllPlayerCardsRevealGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventAllPlayerCardsRevealUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventAllPlayerCardsReveal (byte[] bytes, ref int currentDataIndex, out AllPlayerCardsRevealGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventAllPlayerCardsRevealUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventAllPlayerCardsRevealUniqueDataProcess (byte[] bytes, out AllPlayerCardsRevealGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventAllPlayerCardsRevealUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out AllPlayerCardsRevealGameEvent evt) {
             // Participating Player Count
-            Int16 playerCount = BitConverter.ToInt16 (bytes, startIndex: i);
-            i += sizeof (Int16);
+            ByteConverterUtils.BytesToInt16 (bytes, ref currentDataIndex, out var playerCount);
             // Revealed Player Hands
             Dictionary<Int32, IReadOnlyList<PokerCard>> revealedHands = new ();
             for (int p = 0; p < playerCount; p++) {
                 // Player ID (KEY)
-                Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-                i += sizeof (Int32);
+                ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
                 // Player Cards (VALUE)
                 List<PokerCard> cards = new ();
                 for (int c = 0; c < HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; c++) {
-                    i = GameModelByteConverter.BytesToPokerCard (bytes, out var card, startIndex: i);
+                    GameModelByteConverter.BytesToPokerCard (bytes, ref currentDataIndex, out var card);
                     cards.Add (card);
                 }
                 revealedHands.Add (playerID, cards);
@@ -611,7 +530,6 @@ namespace TCSHoldEmPoker.Network.Data {
             evt = new () {
                 revealedHands = revealedHands,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventAllPlayerCardsReveal (AllPlayerCardsRevealGameEvent evt) {
@@ -621,13 +539,11 @@ namespace TCSHoldEmPoker.Network.Data {
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // Participating Player Count
-                    foreach (byte playerCountByte in BitConverter.GetBytes ((Int16)evt.revealedHands.Count))
-                        uniqueByteList.Add (playerCountByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes ((Int16)evt.revealedHands.Count));
                     // Revealed Player Hands
                     foreach (var kvp in evt.revealedHands) {
                         // Player ID (KEY)
-                        foreach (byte playerIDByte in BitConverter.GetBytes (kvp.Key))
-                            uniqueByteList.Add (playerIDByte);
+                        uniqueByteList.AddRange (BitConverter.GetBytes (kvp.Key));
                         // Player Cards (VALUE)
                         foreach (var card in kvp.Value)
                             uniqueByteList.AddRange (GameModelByteConverter.BytesFromPokerCard (card));
@@ -639,24 +555,20 @@ namespace TCSHoldEmPoker.Network.Data {
 
         // PLAYER WIN
 
-        public static int BytesToPokerGameEventPlayerWin (byte[] bytes, out PlayerWinGameEvent evt, int startIndex = 0) {
-            return BytesToPokerGameEvent (bytes, out evt, PokerGameEventPlayerWinUniqueDataProcess, startIndex);
+        public static void BytesToPokerGameEventPlayerWin (byte[] bytes, ref int currentDataIndex, out PlayerWinGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerWinUniqueDataProcess, out evt);
         }
 
-        private static int PokerGameEventPlayerWinUniqueDataProcess (byte[] bytes, out PlayerWinGameEvent evt, int startIndex = 0) {
-            int i = startIndex;
+        private static void PokerGameEventPlayerWinUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerWinGameEvent evt) {
             // Player ID
-            Int32 playerID = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
             // Chips Won
-            Int32 chipsWon = BitConverter.ToInt32 (bytes, startIndex: i);
-            i += sizeof (Int32);
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var chipsWon);
 
             evt = new () {
                 playerID = playerID,
                 chipsWon = chipsWon,
             };
-            return i;
         }
 
         public static byte[] BytesFromPokerGameEventPlayerWin (PlayerWinGameEvent evt) {
@@ -665,11 +577,9 @@ namespace TCSHoldEmPoker.Network.Data {
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // Player ID
-                    foreach (byte playerIDByte in BitConverter.GetBytes (evt.playerID))
-                        uniqueByteList.Add (playerIDByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
                     // Chips Won
-                    foreach (byte chipsWonByte in BitConverter.GetBytes (evt.chipsWon))
-                        uniqueByteList.Add (chipsWonByte);
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.chipsWon));
 
                     return uniqueByteList;
                 });
