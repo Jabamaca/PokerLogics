@@ -7,8 +7,12 @@ using TCSHoldEmPoker.Network.Events;
 namespace TCSHoldEmPoker.Network.Data {
     public static class PokerGameEventByteConverter {
 
+        #region Defines
+
         private delegate void UniqueDataToEventProcess<EVT> (byte[] bytes, ref int currentDataIndex, out EVT evt) where EVT : PokerGameEvent;
         private delegate IReadOnlyList<byte> UniqueDataFromEventProcess<EVT> (EVT evt) where EVT : PokerGameEvent;
+
+        #endregion
 
         #region Methods
 
@@ -26,7 +30,9 @@ namespace TCSHoldEmPoker.Network.Data {
             currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
         }
 
-        private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, UniqueDataFromEventProcess<EVT> uniqueDataProcess) where EVT : PokerGameEvent {
+        private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, UniqueDataFromEventProcess<EVT> uniqueDataProcess) 
+            where EVT : PokerGameEvent {
+
             if (evt == null)
                 return null;
 

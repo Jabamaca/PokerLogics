@@ -1,9 +1,9 @@
 using TCSHoldEmPoker.Network.Define;
 
-namespace TCSHoldEmPoker.Network.Input {
+namespace TCSHoldEmPoker.Network.Inputs {
     public sealed class PlayerBetCallActionGameInput : PokerGameInput {
 
-        public override PokerGameInputType GameSignalType => PokerGameInputType.PLAYER_ACTION_BET_CALL;
+        public override PokerGameInputType GameInputType => PokerGameInputType.PLAYER_ACTION_BET_CALL;
 
     }
 }
