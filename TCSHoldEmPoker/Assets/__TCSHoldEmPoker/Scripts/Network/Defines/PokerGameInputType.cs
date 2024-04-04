@@ -1,7 +1,7 @@
 using System;
 
 namespace TCSHoldEmPoker.Network.Define {
-    public enum PokerGameSignalType : Int16 {
+    public enum PokerGameInputType : Int16 {
     
         NULL                                    = 0x0000,
 
@@ -10,10 +10,10 @@ namespace TCSHoldEmPoker.Network.Define {
         PLAYER_REQUEST_LEAVE                    = 0x0002,
 
         // Player Action Signals
-        PLAYER_INPUT_BET_CHECK                  = 0x0003,
-        PLAYER_INPUT_BET_CALL                   = 0x0004,
-        PLAYER_INPUT_BET_RAISE                  = 0x0005,
-        PLAYER_INPUT_BET_FOLD                   = 0x0006,
+        PLAYER_ACTION_BET_CHECK                 = 0x0003,
+        PLAYER_ACTION_BET_CALL                  = 0x0004,
+        PLAYER_ACTION_BET_RAISE                 = 0x0005,
+        PLAYER_ACTION_BET_FOLD                  = 0x0006,
 
     }
 }
