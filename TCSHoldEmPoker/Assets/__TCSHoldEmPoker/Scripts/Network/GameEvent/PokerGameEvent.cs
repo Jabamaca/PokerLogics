@@ -1,5 +1,5 @@
-using GameUtils.Observing;
 using System;
+using GameUtils.Observing;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Events {

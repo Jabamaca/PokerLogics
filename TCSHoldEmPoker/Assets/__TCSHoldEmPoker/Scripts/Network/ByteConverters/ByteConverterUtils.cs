@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
-using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class ByteConverterUtils {

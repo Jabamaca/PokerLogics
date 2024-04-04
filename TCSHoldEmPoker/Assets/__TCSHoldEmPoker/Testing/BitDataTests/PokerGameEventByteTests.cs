@@ -6,7 +6,6 @@ using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Events;
-using System.ComponentModel;
 
 public class PokerGameEventByteTests {
 
