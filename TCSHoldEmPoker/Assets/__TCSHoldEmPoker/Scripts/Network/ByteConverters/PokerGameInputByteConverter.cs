@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.Inputs;
+using TCSHoldEmPoker.Network.GameInputs;
 
 namespace TCSHoldEmPoker.Network.Data {
-    public static class PokerGameInputByteConverted {
+    public static class PokerGameInputByteConverter {
 
         #region Defines
 

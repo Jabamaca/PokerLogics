@@ -1,7 +1,7 @@
 using System;
 using TCSHoldEmPoker.Network.Define;
 
-namespace TCSHoldEmPoker.Network.Events {
+namespace TCSHoldEmPoker.Network.GameEvents {
     public sealed class PlayerBetRaiseGameEvent : PokerGameEvent {
 
         public override PokerGameEventType GameEventType => isAllIn ? 

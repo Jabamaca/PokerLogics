@@ -1,7 +1,7 @@
 using System;
 using TCSHoldEmPoker.Network.Define;
 
-namespace TCSHoldEmPoker.Network.Events {
+namespace TCSHoldEmPoker.Network.GameEvents {
     public sealed class TableGatherWagersGameEvent : PokerGameEvent {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.TABLE_GATHER_WAGERS;

@@ -2,7 +2,7 @@ using System;
 using GameUtils.Observing;
 using TCSHoldEmPoker.Network.Define;
 
-namespace TCSHoldEmPoker.Network.Inputs {
+namespace TCSHoldEmPoker.Network.GameInputs {
     public abstract class PokerGameInput : Observable {
 
         public virtual PokerGameInputType GameInputType => PokerGameInputType.NULL;

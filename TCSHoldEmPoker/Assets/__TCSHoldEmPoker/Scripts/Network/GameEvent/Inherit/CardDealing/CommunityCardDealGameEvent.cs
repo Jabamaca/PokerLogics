@@ -2,7 +2,7 @@ using System;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
 
-namespace TCSHoldEmPoker.Network.Events {
+namespace TCSHoldEmPoker.Network.GameEvents {
     public sealed class CommunityCardDealGameEvent : PokerGameEvent {
 
         public override PokerGameEventType GameEventType => PokerGameEventType.COMMUNITY_CARD_DEAL;
