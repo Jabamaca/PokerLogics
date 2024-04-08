@@ -6,6 +6,7 @@ namespace TCSHoldEmPoker.Network.Define {
         NULL_PREFIX                                     = 0x0000,
         POKER_GAME_EVENT_PREFIX                         = 0x0100,
         POKER_GAME_INPUT_PREFIX                         = 0x0200,
+        POKER_GAME_STATE_UPDATE                         = 0x0300,
 
         // POKER GAME EVENTS
         // Connectivity

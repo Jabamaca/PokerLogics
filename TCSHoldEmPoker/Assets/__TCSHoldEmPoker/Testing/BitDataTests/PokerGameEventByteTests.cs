@@ -5,7 +5,7 @@ using GameUtils;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.GameEvents;
+using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
 
 public class PokerGameEventByteTests {
 

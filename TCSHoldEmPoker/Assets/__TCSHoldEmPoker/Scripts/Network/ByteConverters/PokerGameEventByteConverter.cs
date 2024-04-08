@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.GameEvents;
+using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class PokerGameEventByteConverter {

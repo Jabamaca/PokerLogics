@@ -2,7 +2,7 @@ using NUnit.Framework;
 using System;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.GameInputs;
+using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
 
 public class PokerGameInputByteTests {
 

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.GameInputs;
+using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class PokerGameInputByteConverter {

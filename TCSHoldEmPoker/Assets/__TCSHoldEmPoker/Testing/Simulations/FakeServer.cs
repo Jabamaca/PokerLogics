@@ -6,7 +6,7 @@ using GameUtils.Observing;
 using TCSHoldEmPoker.Network;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
-using TCSHoldEmPoker.Network.GameEvents;
+using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
 
 public class FakeServer : MonoBehaviour {
 

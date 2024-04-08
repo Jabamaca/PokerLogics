@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using TCSHoldEmPoker.Network.GameEvents;
-using TCSHoldEmPoker.Network.GameInputs;
+using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
+using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
 
 namespace TCSHoldEmPoker.Network.Data {
     public class NetworkActivityFrame {
