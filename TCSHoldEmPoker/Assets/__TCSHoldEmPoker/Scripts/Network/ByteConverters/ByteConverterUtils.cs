@@ -132,6 +132,14 @@ namespace TCSHoldEmPoker.Network.Data {
         public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
 
+        // Size of Game State Update
+        public const int SIZEOF_POKER_GAME_STATE_UPDATE =
+            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
+            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
+            sizeof (Int32) +                                                        // Game ID
+            SIZEOF_TABLE_STATE_DATA +                                               // Updated Table State Data
+            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
+
         public const int BIT_COUNT_OF_BYTE = 8;
         public const int BIT_COUNT_OF_INT16 = 16;
 
