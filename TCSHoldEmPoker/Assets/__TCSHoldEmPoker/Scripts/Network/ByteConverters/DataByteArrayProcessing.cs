@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Network.Define;
 using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
 using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
+using GameUtils.Observing;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class DataByteArrayProcessing {
@@ -71,9 +72,7 @@ namespace TCSHoldEmPoker.Network.Data {
             return deFramedByteList.ToArray ();
         }
 
-        public static NetworkActivityFrame ProcessDeFramedByteArrayIntoNetworkActivities (byte[] deframedDataBytes) {
-            NetworkActivityFrame netFrame = new ();
-
+        public static void ProcessDeFramedByteArrayIntoNetworkActivities (byte[] deframedDataBytes) {
             int dataLength = deframedDataBytes.Length;
             int currentDataIndex = 0;
 
@@ -85,10 +84,14 @@ namespace TCSHoldEmPoker.Network.Data {
 
                     switch (networkActivityPrefix) {
                         case NetworkActivityID.POKER_GAME_EVENT_PREFIX:
-                            netFrame.AddGameEvent (ProcessDeFramedByteArrayIntoGameEvent (deframedDataBytes, ref currentDataIndex, networkActivityID));
+                            ProcessDeFramedByteArrayIntoGameEvent (deframedDataBytes, ref currentDataIndex, networkActivityID);
                             break;
                         case NetworkActivityID.POKER_GAME_INPUT_PREFIX:
-                            netFrame.AddGameInput (ProcessDeFramedByteArrayIntoGameInput (deframedDataBytes, ref currentDataIndex, networkActivityID));
+                            ProcessDeFramedByteArrayIntoGameInput (deframedDataBytes, ref currentDataIndex, networkActivityID);
+                            break;
+                        case NetworkActivityID.POKER_GAME_STATE_UPDATE:
+                            NetworkActivityByteConverter.BytesToPokerGameStateUpdate (deframedDataBytes, ref currentDataIndex, out var pokerGameStateUpdate);
+                            GlobalObserver.NotifyObservers (pokerGameStateUpdate);
                             break;
                         default:
                             // Move-On to Next Byte
@@ -97,129 +100,149 @@ namespace TCSHoldEmPoker.Network.Data {
                     }
                 }
             }
-
-            return netFrame;
         }
 
-        private static PokerGameEvent ProcessDeFramedByteArrayIntoGameEvent (byte[] deframedDataBytes, ref int currentDataIndex, NetworkActivityID networkActivityID) {
+        private static void ProcessDeFramedByteArrayIntoGameEvent (byte[] deframedDataBytes, ref int currentDataIndex, NetworkActivityID networkActivityID) {
             switch (networkActivityID) {
                 // CONNECTIVITY
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_JOIN: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerJoin (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_LEAVE: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerLeave (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 // ANTE PROGRESSION
                 case NetworkActivityID.POKER_GAME_EVENT_ANTE_START: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_ANTE_PHASE_CHANGE: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAntePhaseChange (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_ANTE_TURN_CHANGE: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAnteTurnChange (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_ANTE_END: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAnteEnd (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 // CARD DEALING
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_CARD_DEAL: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerCardDeal (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_COMMUNITY_CARD_DEAL: {
                     PokerGameEventByteConverter.BytesToPokerGameEventCommunityCardDeal (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 // PLAYER ACTION
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_BLIND: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetBlind (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CHECK: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCheck (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_BASIC: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallBasic (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_ALL_IN: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetCallAllIn (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_BASIC: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseBasic (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_ALL_IN: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetRaiseAllIn (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_FOLD: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerBetFold (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 // WIN CONDITION
                 case NetworkActivityID.POKER_GAME_EVENT_TABLE_GATHER_WAGERS: {
                     PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAllPlayerCardsReveal (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_EVENT_PLAYER_WIN: {
                     PokerGameEventByteConverter.BytesToPokerGameEventPlayerWin (deframedDataBytes, ref currentDataIndex, out var evt);
-                    return evt;
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
                 }
             }
 
             // If Network Activity ID is invalid, move-on to Next Byte
             currentDataIndex++;
-            return null;
         }
 
-        private static PokerGameInput ProcessDeFramedByteArrayIntoGameInput (byte[] deframedDataBytes, ref int currentDataIndex, NetworkActivityID networkActivityID) {
+        private static void ProcessDeFramedByteArrayIntoGameInput (byte[] deframedDataBytes, ref int currentDataIndex, NetworkActivityID networkActivityID) {
             switch (networkActivityID) {
                 // CONNECTIVITY
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_REQUEST_JOIN: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerRequestJoin (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerRequestLeave (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
                 // PLAYER ACTION
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerActionBetCheck (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerActionBetCall (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerActionBetRaise (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
                 case NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD: {
                     PokerGameInputByteConverter.BytesToPokerGameInputPlayerActionBetFold (deframedDataBytes, ref currentDataIndex, out var input);
-                    return input;
+                    GlobalObserver.NotifyObservers (input);
+                    return;
                 }
             }
 
             // If Network Activity ID is invalid, move-on to Next Byte
             currentDataIndex++;
-            return null;
         }
     }
 }
