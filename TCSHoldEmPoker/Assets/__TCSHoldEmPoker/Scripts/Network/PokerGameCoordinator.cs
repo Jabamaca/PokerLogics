@@ -1,5 +1,7 @@
+using GameUtils.Observing;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models;
+using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
 
 namespace TCSHoldEmPoker.Network {
     public class PokerGameCoordinator {
@@ -64,6 +66,20 @@ namespace TCSHoldEmPoker.Network {
             return newTableHost;
         }
 
+        private void AddObservers () {
+            // Poker Game Inputs
+            GlobalObserver.AddObserver<PlayerJoinRequestGameInput> (OnPlayerJoinRequest);
+            GlobalObserver.AddObserver<PlayerLeaveRequestGameInput> (OnPlayerLeaveRequest);
+            GlobalObserver.AddObserver<PlayerBetCheckActionGameInput> (OnPlayerBetCheckAction);
+            GlobalObserver.AddObserver<PlayerBetCallActionGameInput> (OnPlayerBetCallAction);
+            GlobalObserver.AddObserver<PlayerBetRaiseActionGameInput> (OnPlayerBetRaiseAction);
+            GlobalObserver.AddObserver<PlayerBetFoldActionGameInput> (OnPlayerBetFoldAction);
+        }
+
+        private void RemoveObservers () {
+        
+        }
+
         private void AddDelegationToGameTable (GameTableModelHost gameTable) {
             gameTable.DidPlayerJoin += DidPlayerJoin;
             gameTable.DidPlayerLeave += DidPlayerLeave;
@@ -112,6 +128,54 @@ namespace TCSHoldEmPoker.Network {
             gameTable.DidGatherWagersToPot -= DidGatherWagersToPot;
             gameTable.DidRevealAllHands -= DidRevealAllHands;
             gameTable.DidPlayerWin -= DidPlayerWin;
+        }
+
+        #endregion
+
+        #region Observers
+
+        // CONNECTIVITY
+
+        private void OnPlayerJoinRequest (PlayerJoinRequestGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                if (gameTableHost.TryPlayerIDJoin (input.playerID, input.buyInChips)) {
+                    // TODO: Response???
+                }
+            }
+        }
+
+        private void OnPlayerLeaveRequest (PlayerLeaveRequestGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                gameTableHost.PlayerIDLeave (input.playerID, out int redeemedChips);
+
+                // TODO: Do something interactive with remaining chips.
+            }
+        }
+
+        // PLAYER ACTION
+
+        private void OnPlayerBetCheckAction (PlayerBetCheckActionGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                gameTableHost.PlayerCheckOrCall (input.playerID);
+            }
+        }
+
+        private void OnPlayerBetCallAction (PlayerBetCallActionGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                gameTableHost.PlayerCheckOrCall (input.playerID);
+            }
+        }
+
+        private void OnPlayerBetRaiseAction (PlayerBetRaiseActionGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                gameTableHost.PlayerRaise (input.playerID, input.newStake);
+            }
+        }
+
+        private void OnPlayerBetFoldAction (PlayerBetFoldActionGameInput input) {
+            if (GetGameTableHostWithID (input.gameTableID, out var gameTableHost)) {
+                gameTableHost.PlayerFold (input.playerID);
+            }
         }
 
         #endregion
