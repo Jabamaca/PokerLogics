@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Network.Define;
-using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
-using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
 using GameUtils.Observing;
 
 namespace TCSHoldEmPoker.Network.Data {

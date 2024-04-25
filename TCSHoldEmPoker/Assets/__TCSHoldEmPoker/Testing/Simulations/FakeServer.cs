@@ -12,6 +12,9 @@ public class FakeServer : MonoBehaviour {
 
     #region Properties
 
+    [SerializeField]
+    private float _ping = 0.016f;
+
     private readonly PokerGameCoordinator _gameCoordinator = new ();
 
     #endregion
