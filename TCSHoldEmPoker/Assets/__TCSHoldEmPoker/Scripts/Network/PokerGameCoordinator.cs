@@ -32,7 +32,8 @@ namespace TCSHoldEmPoker.Network {
         public DidPlayerFoldHandler DidPlayerFold = delegate { };
 
         // Win Condition Delegates
-        public DidGatherWagersToPotHandler DidGatherWagersToPot = delegate { };
+        public DidUpdateMainPrizePotHandler DidUpdateMainPrizePot = delegate { };
+        public DidCreateSidePrizePotHandler DidCreateSidePrizePot = delegate { };
         public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
         public DidPlayerWinHandler DidPlayerWin = delegate { };
 
@@ -100,7 +101,8 @@ namespace TCSHoldEmPoker.Network {
             gameTable.DidPlayerBetRaiseAllIn += DidPlayerBetRaiseAllIn;
             gameTable.DidPlayerFold += DidPlayerFold;
 
-            gameTable.DidGatherWagersToPot += DidGatherWagersToPot;
+            gameTable.DidUpdateMainPrizePot += DidUpdateMainPrizePot;
+            gameTable.DidCreateSidePrizePot += DidCreateSidePrizePot;
             gameTable.DidRevealAllHands += DidRevealAllHands;
             gameTable.DidPlayerWin += DidPlayerWin;
         }
@@ -125,7 +127,8 @@ namespace TCSHoldEmPoker.Network {
             gameTable.DidPlayerBetRaiseAllIn -= DidPlayerBetRaiseAllIn;
             gameTable.DidPlayerFold -= DidPlayerFold;
 
-            gameTable.DidGatherWagersToPot -= DidGatherWagersToPot;
+            gameTable.DidUpdateMainPrizePot -= DidUpdateMainPrizePot;
+            gameTable.DidCreateSidePrizePot -= DidCreateSidePrizePot;
             gameTable.DidRevealAllHands -= DidRevealAllHands;
             gameTable.DidPlayerWin -= DidPlayerWin;
         }

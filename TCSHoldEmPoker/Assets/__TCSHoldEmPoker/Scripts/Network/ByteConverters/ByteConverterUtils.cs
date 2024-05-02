@@ -27,14 +27,23 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_PLAYER_STATE_DATA +                                              // Seated Player State Data
             sizeof (byte) +                                                         // BoolSet #1 (didCheck, isPlaying)
             sizeof (Int32);                                                         // Current Wager
-        public const int SIZEOF_TABLE_STATE_DATA =
+        public const int SIZEOF_TABLE_STATE_DATA_BASE =
             sizeof (Int32) +                                                        // Minimum Wager
             sizeof (Int32) +                                                        // Current Table Stake
-            sizeof (Int32) +                                                        // Cash Pot
+            SIZEOF_PRIZE_POT_STATE_DATA_BASE +                                      // Main Prize Pot
+            /* (Qualified Player Count) * (Player ID) */                            // Main Prize Pot Qualified Players Data (Flexible number)
+            sizeof (Int16) +                                                        // Side Prize Pot Count
+            /* (Side Prize Pot Count) * [[VARIED PRIZE POT SIZE]]  */               // Side Prize Pots Data (Flexible number)
             (SIZEOF_SEAT_STATE_DATA * HoldEmPokerDefines.POKER_TABLE_CAPACITY) +    // Seat State Data Order
             SIZEOF_GAME_PHASE +                                                     // Current Game Phase
             sizeof (Int16) +                                                        // Current Turn Seat Index
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);     // Community Card Order
+        public const int SIZEOF_PRIZE_POT_STATE_DATA_BASE =
+            sizeof (Int32) +                                                        // Prize Amount
+            sizeof (Int16);                                                         // Qualified Players Count
+            /* (Player Count) * (Player ID) */                                      // Qualified Players Data (Flexible number)
+        public const int SIZEOF_PRIZE_POT_STATE_DATA_PLAYER = 
+            sizeof (Int32);                                                         // Player ID
 
         // Sizes of Game Events
         // COMMON DATA
@@ -91,10 +100,13 @@ namespace TCSHoldEmPoker.Network.Data {
         public const int SIZEOF_POKER_GAME_EVENT_BET_FOLD =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32);                                                         // Player ID
-        // Win Condention
-        public const int SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS =
+        // Win Condition
+        public const int SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // New Cash Pot Total
+            sizeof (Int32);                                                         // Updated Prize Total
+        public const int SIZEOF_POKER_GAME_EVENT_TABLE_CREATE_SIDE_POT =
+            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
+            sizeof (Int32);                                                         // Side Pot Prize Total
         public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int16);                                                         // Participating Players Count
@@ -133,11 +145,11 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
 
         // Size of Game State Update
-        public const int SIZEOF_POKER_GAME_STATE_UPDATE =
+        public const int SIZEOF_POKER_GAME_STATE_UPDATE_BASE =
             SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
             SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
             sizeof (Int32) +                                                        // Game ID
-            SIZEOF_TABLE_STATE_DATA +                                               // Updated Table State Data
+            SIZEOF_TABLE_STATE_DATA_BASE +                                          // Updated Table State Data
             SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
 
         public const int BIT_COUNT_OF_BYTE = 8;

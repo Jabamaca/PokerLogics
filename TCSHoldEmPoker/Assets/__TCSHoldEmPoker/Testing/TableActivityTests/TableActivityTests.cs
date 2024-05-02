@@ -15,7 +15,7 @@ public class TableActivityTests {
             deck.Shuffle ();
             var d2 = deck.ShuffledDeck;
 
-            Assert.IsFalse (ListUtils.CheckEquals (d1, d2));
+            Assert.IsFalse (ListUtils.CheckEqualsOrder (d1, d2));
         }
     }
 }

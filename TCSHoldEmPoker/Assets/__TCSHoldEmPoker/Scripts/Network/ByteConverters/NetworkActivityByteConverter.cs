@@ -1,4 +1,5 @@
 using System;
+using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Network.Activity;
 using TCSHoldEmPoker.Network.Define;
 
@@ -23,7 +24,14 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameStateUpdate (PokerGameStateUpdate stateUpdate) {
-            byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE];
+            int dataSize = ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE_BASE;
+            dataSize += stateUpdate.updatedTableStateData.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
+            foreach (var sidePrizeData in stateUpdate.updatedTableStateData.sidePrizeStateDataList) {
+                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
+                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER * sidePrizeData.qualifiedPlayerIDs.Count;
+            }
+
+            byte[] returnBytes = new byte[dataSize];
 
             int currentDataIndex = 0;
             // Network Activity START Signature

@@ -12,6 +12,7 @@ namespace TCSHoldEmPoker.Models {
         public bool IsSeatEmpty => _seatedPlayer == null;
         public int SeatedPlayerID => IsSeatEmpty ? -1 : _seatedPlayer.PlayerID;
         public int SeatedPlayerChips => IsSeatEmpty ? 0 : _seatedPlayer.ChipsInHand;
+        public bool IsAllIn => IsPlaying && SeatedPlayerChips <= 0 && _currentWager > 0;
 
         private bool _didCheck = false;
         public bool DidCheck => _didCheck;
@@ -153,6 +154,18 @@ namespace TCSHoldEmPoker.Models {
             _didCheck = false;
             _currentWager = 0;
             return collectedChips;
+        }
+
+        public int CollectWageredChips (int collectLimit) {
+            if (_currentWager <= 0) {
+                return 0;
+            } else if (collectLimit >= _currentWager) {
+                return CollectWageredChips ();
+            }
+
+            _currentWager -= collectLimit;
+            _didCheck = false;
+            return collectLimit;
         }
 
         #endregion

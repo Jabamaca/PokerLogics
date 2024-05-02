@@ -1,8 +1,10 @@
 using NUnit.Framework;
+using System.Collections.Generic;
 using TCSHoldEmPoker.Network.Data;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Data;
+using System;
 
 public class GameModelByteTests {
 
@@ -87,11 +89,47 @@ public class GameModelByteTests {
     }
 
     [Test]
+    public void PokerData_PrizePotStateDataConversion_Test () {
+        PrizePotStateData ppsd1 = new PrizePotStateData () {
+            prizeAmount = 11000,
+            qualifiedPlayerIDs = new List<Int32> {
+                44223,
+                11222,
+                12222
+            }
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE +
+            (ppsd1.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER);
+
+        byte[] ppsdBytes = GameModelByteConverter.BytesFromPrizePotStateData (ppsd1);
+        Assert.AreEqual (ppsdBytes.Length, expectedSize);
+        int currentDataIndex = 0;
+        GameModelByteConverter.BytesToPrizePotStateData (ppsdBytes, ref currentDataIndex, out var ppsd2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+
+        Assert.IsTrue (ppsd1.Equals (ppsd2));
+    }
+
+    [Test]
     public void PokerData_TableStateDataConversion_Test () {
         TableStateData tsd1 = new () {
             minimumWager = 1500,
             currentTableStake = 2500,
-            cashPot = 11500,
+            mainPrizeStateData = new PrizePotStateData {
+                prizeAmount = 6000,
+                qualifiedPlayerIDs = new List<Int32> {
+                    2345, 9292, 1818, 8008
+                },
+            },
+            sidePrizeStateDataList = new List<PrizePotStateData> {
+                new PrizePotStateData {
+                    prizeAmount = 7500,
+                qualifiedPlayerIDs = new List<Int32> {
+                    2345, 9292, 1818, 8008, 6654
+                },
+                }
+            },
             seatStateDataOrder = new () {
                 new () {
                     seatedPlayerStateData = new () {
@@ -177,11 +215,18 @@ public class GameModelByteTests {
             }
         };
 
+        int expectedSize = ByteConverterUtils.SIZEOF_TABLE_STATE_DATA_BASE;
+        expectedSize += tsd1.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
+        foreach (var sidePrizeData in tsd1.sidePrizeStateDataList) {
+            expectedSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
+            expectedSize += sidePrizeData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
+        }
+
         byte[] tsdBytes = GameModelByteConverter.BytesFromTableStateData (tsd1);
-        Assert.AreEqual (tsdBytes.Length, ByteConverterUtils.SIZEOF_TABLE_STATE_DATA);
+        Assert.AreEqual (tsdBytes.Length, expectedSize);
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToTableStateData (tsdBytes, ref currentDataIndex, out var tsd2);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_TABLE_STATE_DATA);
+        Assert.AreEqual (currentDataIndex, expectedSize);
 
         Assert.IsTrue (tsd1.Equals (tsd2));
     }

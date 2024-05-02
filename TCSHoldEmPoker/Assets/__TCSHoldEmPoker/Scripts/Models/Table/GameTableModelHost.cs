@@ -28,7 +28,8 @@ namespace TCSHoldEmPoker.Models {
     public delegate void DidPlayerFoldHandler (int gameTableID, int playerID);
 
     // Win Condition Delegates
-    public delegate void DidGatherWagersToPotHandler (int gameTableID, int newCashPot);
+    public delegate void DidUpdateMainPrizePotHandler (int gameTableID, int wagerPerPlayer);
+    public delegate void DidCreateSidePrizePotHandler (int gameTableID, int wagerPerPlayer);
     public delegate void DidRevealAllHandsHandler (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands);
     public delegate void DidPlayerWinHandler (int gameTableID, int playerID, int chipsWon, PokerHand winningHand);
 
@@ -60,7 +61,8 @@ namespace TCSHoldEmPoker.Models {
         public DidPlayerFoldHandler DidPlayerFold = delegate { };
 
         // Win Condition Delegates
-        public DidGatherWagersToPotHandler DidGatherWagersToPot = delegate { };
+        public DidUpdateMainPrizePotHandler DidUpdateMainPrizePot = delegate { };
+        public DidCreateSidePrizePotHandler DidCreateSidePrizePot = delegate { };
         public DidRevealAllHandsHandler DidRevealAllHands = delegate { };
         public DidPlayerWinHandler DidPlayerWin = delegate { };
 
@@ -82,7 +84,8 @@ namespace TCSHoldEmPoker.Models {
 
             _minimumWager = minWager;
             _currentTableStake = 0;
-            _cashPot = 0;
+            _mainPrizePot = null;
+            _sidePrizePots.Clear ();
 
             _currentTurnSeatIndex = 0;
             for (int i = 0; i < TABLE_CAPACITY; i++) {
@@ -223,7 +226,8 @@ namespace TCSHoldEmPoker.Models {
             }
 
             ReadyPlayersForAnte ();
-            _cashPot = 0;
+            _sidePrizePots.Clear ();
+            _mainPrizePot = new PrizePotModel (GetPlayerIDsWithChips ());
             _deck.Shuffle ();
 
             DidAnteStart?.Invoke (_gameTableID);
@@ -324,15 +328,7 @@ namespace TCSHoldEmPoker.Models {
             RevealAllHands ();
             DealMissingCommunityCards ();
 
-            if (CalculateWinners (out var winnerSeats, out var winningHand)) {
-                TriggerGamePhase (PokerGamePhaseEnum.WINNING);
-
-                // Calculate player/s prize.
-                int chipPrize = _cashPot / winnerSeats.Count;
-                foreach (var seat in winnerSeats) {
-                    PlayerSeatWin (seat, chipPrize, winningHand);
-                }
-            }
+            CalculateWinners ();
 
             EndOfAnte ();
         }
@@ -353,26 +349,48 @@ namespace TCSHoldEmPoker.Models {
             }
         }
 
-        private bool CalculateWinners (out List<TableSeatModel> winnerSeats, out PokerHand winningHand) {
-            winnerSeats = new ();
-            winningHand = BlankHandMaker.BlankHand;
+        private void CalculateWinners () {
+            // List all best hands for players.
+            Dictionary<int, PokerHand> playerHands = new ();
             foreach (var seat in _playerSeats) {
                 if (seat.IsPlaying) {
-                    PokerHand seatHand = PokerHandFactory.GetHighestPokerHandWithCardSets (_communityCards, seat.DealtCards);
-                    int handComp = seatHand.CompareTo (winningHand);
-
-                    if (handComp > 0) { // Winning hand overtake.
-                        winningHand = seatHand;
-                        winnerSeats.Clear ();
-                        winnerSeats.Add (seat);
-
-                    } else if (handComp == 0) { // Current winning hand is tied with.
-                        winnerSeats.Add (seat);
-                    }
+                    PokerHand playerHand = PokerHandFactory.GetHighestPokerHandWithCardSets (_communityCards, seat.DealtCards);
+                    playerHands.Add (seat.SeatedPlayerID, playerHand);
                 }
             }
 
-            return winningHand.HandRank != PokerHandRankEnum.NULL;
+            TriggerGamePhase (PokerGamePhaseEnum.WINNING);
+
+            // Get winner of Side Prize Pots first.
+            foreach (var sidePrizePot in _sidePrizePots) {
+                CalculatePotWinners (sidePrizePot, playerHands);
+            }
+            // Get winner of Main Prize Pot, then.
+            CalculatePotWinners (_mainPrizePot, playerHands);
+        }
+
+        private void CalculatePotWinners (PrizePotModel prizePot, IReadOnlyDictionary<int, PokerHand> playerHands) {
+            PokerHand winningHand = null;
+            List<int> winnerPlayerIDs = new ();
+            foreach (var playerID in prizePot.qualifiedPlayerIDs) {
+                PokerHand currentPlayerHand = playerHands[playerID];
+
+                int handComp = currentPlayerHand.CompareTo (winningHand);
+                if (winnerPlayerIDs.Count <= 0 || handComp > 0) { // No winner yet, or found better hand.
+
+                    winningHand = currentPlayerHand;
+                    winnerPlayerIDs.Clear ();
+                    winnerPlayerIDs.Add (playerID);
+
+                } else if (handComp == 0) { // Found equally winning hand.
+                    winnerPlayerIDs.Add (playerID);
+                }
+            }
+
+            int distributedPrize = prizePot.prizeAmount / winnerPlayerIDs.Count;
+            foreach (var playerID in winnerPlayerIDs) {
+                PlayerIDWin (playerID, chipsWon: distributedPrize, winningHand);
+            }
         }
 
         private void WinByDefault (int playerID) {
@@ -380,24 +398,38 @@ namespace TCSHoldEmPoker.Models {
 
             TriggerGamePhase (PokerGamePhaseEnum.WINNING);
 
-            if (FindSeatWithPlayerID (playerID, out var seat)) {
-                PlayerSeatWin (seat, _cashPot, BlankHandMaker.BlankHand);
+            PlayerIDWin (playerID, _mainPrizePot.prizeAmount, BlankHandMaker.BlankHand);
+            foreach (var sidePrizePot in _sidePrizePots) {
+                PlayerIDWin (playerID, sidePrizePot.prizeAmount, BlankHandMaker.BlankHand);
             }
 
             EndOfAnte ();
         }
 
-        private void PlayerSeatWin (TableSeatModel seat, int chipsWon, PokerHand winningHand) {
-            seat.GiveChips (chipsWon);
-            DidPlayerWin?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsWon, winningHand);
+        private void PlayerIDWin (int playerID, int chipsWon, PokerHand winningHand) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.GiveChips (chipsWon);
+                DidPlayerWin?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsWon, winningHand);
+            }
         }
 
         private void EndOfAnte () {
-            _cashPot = 0;
             RemoveCommunityCards ();
+            _sidePrizePots.Clear ();
+            _mainPrizePot = null;
             DidAnteEnd?.Invoke (_gameTableID);
 
+            KickPlayersWithNoChips ();
             TriggerGamePhase (PokerGamePhaseEnum.WAITING);
+        }
+
+        private void KickPlayersWithNoChips () {
+            foreach (var seat in _playerSeats) {
+                if (!seat.IsSeatEmpty && seat.SeatedPlayerChips <= 0) {
+                    seat.UnseatPlayer ();
+                    // TODO: To Edit Jaba Kicked Player Game Event
+                }
+            }
         }
 
         private void CheckAllWagerChecks () {
@@ -486,6 +518,11 @@ namespace TCSHoldEmPoker.Models {
 
             TryPlayerAction (playerID, (seat) => {
                 seat.FoldHand ();
+                _mainPrizePot.DisqualifyPlayerIDFromPot (seat.SeatedPlayerID);
+                foreach (var sidePrizePot in _sidePrizePots) {
+                    sidePrizePot.DisqualifyPlayerIDFromPot (seat.SeatedPlayerID);
+                }
+
                 DidPlayerFold.Invoke (_gameTableID, seat.SeatedPlayerID);
             });
         }
@@ -508,6 +545,7 @@ namespace TCSHoldEmPoker.Models {
                     DidPlayerBetRaise?.Invoke (_gameTableID, seat.SeatedPlayerID, chipsSpent);
                 }
                 _currentTableStake = newStake;
+
             });
         }
 
@@ -527,15 +565,38 @@ namespace TCSHoldEmPoker.Models {
         #region Wagering Methods
 
         private void GatherWagersToPot () {
-            int gatheredWagers = 0;
-            for (int i = 0; i < TABLE_CAPACITY; i++) {
-                gatheredWagers += _playerSeats[i].CollectWageredChips ();
+            if (GetSortedAllInSeats (out var allInSeats)) {
+                foreach (var allInSeat in allInSeats) {
+                    if (allInSeat.CurrentWager <= 0) {
+                        _mainPrizePot.DisqualifyPlayerIDFromPot (allInSeat.SeatedPlayerID);
+                        continue;
+                    }
+                    int allInWager = allInSeat.CurrentWager;
+                    foreach (int playerID in _mainPrizePot.qualifiedPlayerIDs) {
+                        if (FindSeatWithPlayerID (playerID, out var seat)) {
+                            _mainPrizePot.AddPrizeToPot (seat.CollectWageredChips (allInWager));
+                        }
+                    }
+                    var sidePrizePot = _mainPrizePot;
+                    _sidePrizePots.Add (sidePrizePot);
+                    DidCreateSidePrizePot (_gameTableID, wagerPerPlayer: allInWager);
+                    // NEW Main Prize Pot
+                    _mainPrizePot = new PrizePotModel (_mainPrizePot.qualifiedPlayerIDs);
+                    _mainPrizePot.DisqualifyPlayerIDFromPot (allInSeat.SeatedPlayerID);
+                }
             }
 
-            if (gatheredWagers > 0) {
-                _cashPot += gatheredWagers;
-                DidGatherWagersToPot?.Invoke (_gameTableID, _cashPot);
+            // Gather ramaining wagers to Main Prize Pot.
+            int wagerPerPlayer = 0;
+            foreach (int playerID in _mainPrizePot.qualifiedPlayerIDs) {
+                if (FindSeatWithPlayerID (playerID, out var seat)) {
+                    int playerWager = seat.CollectWageredChips ();
+                    if (wagerPerPlayer == 0)
+                        wagerPerPlayer = playerWager; // Save
+                    _mainPrizePot.AddPrizeToPot (playerWager);
+                }
             }
+            DidUpdateMainPrizePot (_gameTableID, wagerPerPlayer);
 
             _currentTableStake = 0;
         }

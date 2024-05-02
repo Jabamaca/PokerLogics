@@ -88,7 +88,7 @@ public class PokerGameEventByteTests {
         Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
         Assert.AreEqual (evt1.playerID, evt2.playerID);
-        Assert.IsTrue (ListUtils.CheckEquals (evt1.cards, evt2.cards));
+        Assert.IsTrue (ListUtils.CheckEqualsOrder (evt1.cards, evt2.cards));
     }
 
     [Test]
@@ -184,22 +184,41 @@ public class PokerGameEventByteTests {
     }
 
     [Test]
-    public void PokerData_TableGatherWagersEventConversion_Test () {
-        TableGatherWagersGameEvent evt1 = new () {
+    public void PokerData_TableUpdateMainPrizeEventConversion_Test () {
+        UpdateMainPrizePotGameEvent evt1 = new () {
             gameTableID = 9193821,
-            newCashPot = 17000,
+            wagerPerPlayer = 17000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS;
-        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableGatherWagers (evt1);
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableUpdateMainPrize (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
-            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_GATHER_WAGERS);
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_UPDATE_MAIN_PRIZE);
 
         int currentDataIndex = 0;
-        PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (evtBytes, ref currentDataIndex, out var evt2);
+        PokerGameEventByteConverter.BytesToPokerGameEventTableUpdateMainPrize (evtBytes, ref currentDataIndex, out var evt2);
         Assert.AreEqual (currentDataIndex, expectedSize);
         TestPokerGameEventCommonData (evt1, evt2);
-        Assert.AreEqual (evt1.newCashPot, evt2.newCashPot);
+        Assert.AreEqual (evt1.wagerPerPlayer, evt2.wagerPerPlayer);
+    }
+
+    [Test]
+    public void PokerData_TableCreateSidePrizeEventConversion_Test () {
+        CreateSidePrizePotGameEvent evt1 = new () {
+            gameTableID = 9193821,
+            wagerPerPlayer = 17000,
+        };
+
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableCreateSidePrize (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_CREATE_SIDE_PRIZE);
+
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventTableCreateSidePrize (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.wagerPerPlayer, evt2.wagerPerPlayer);
     }
 
     [Test]
@@ -245,7 +264,7 @@ public class PokerGameEventByteTests {
         Assert.AreEqual (evt1.revealedHands.Count, evt2.revealedHands.Count);
         foreach (var kvp in evt1.revealedHands) {
             Assert.IsTrue (evt2.revealedHands.TryGetValue (kvp.Key, out var value2));
-            Assert.IsTrue (ListUtils.CheckEquals (kvp.Value, value2));
+            Assert.IsTrue (ListUtils.CheckEqualsOrder (kvp.Value, value2));
         }
     }
 

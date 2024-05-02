@@ -102,7 +102,7 @@ public class PokerGameTest {
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CALL Spend:500 [500 --> 1000]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-5 CHECK Spend:0 [1000 --> 1000]
 
-        Assert.AreEqual (tableHost.TableHost.CashPot, 5000);                                    // Check POT == 5000
+        Assert.AreEqual (tableHost.TableHost.GetPrizePotAmounts ()[0], 5000);                                    // Check POT == 5000
 
         // THE-FLOP
         Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Proceed to THE FLOP.
@@ -114,7 +114,7 @@ public class PokerGameTest {
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-3 CALL Spend:2000 [0 --> 2000]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CALL Spend:2000 [0 --> 2000]
 
-        Assert.AreEqual (tableHost.TableHost.CashPot, 13000);                                    // Check POT == 13000
+        Assert.AreEqual (tableHost.TableHost.GetPrizePotAmounts ()[0], 13000);                                    // Check POT == 13000
 
         // THE TURN
         Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_TURN);        // Proceed to THE TURN.
@@ -125,7 +125,8 @@ public class PokerGameTest {
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CALL Spend:1000 [0 --> 1000]
         tableHost.TableHost.PlayerFold (tableHost.CurrentTurnID);                               // ***MOVE*** Player-5 FOLD Spend:0 [0 --> 0]
 
-        Assert.AreEqual (tableHost.TableHost.CashPot, 16000);                                    // Check POT == 16000
+        Assert.AreEqual (tableHost.TableHost.GetPrizePotAmounts ()[0], 16000);                                    // Check POT == 16000
+        Assert.AreEqual (tableHost.TableHost.GetPrizePotAmounts ()[0], 16000);                                    // Check POT == 16000
 
         // THE RIVER
         Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_RIVER);        // Proceed to THE RIVER.
@@ -156,7 +157,7 @@ public class PokerGameTest {
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-4 CALL Spend:500 [500 --> 1000]
         tableHost.TableHost.PlayerCheckOrCall (tableHost.CurrentTurnID);                        // ***MOVE*** Player-5 CHECK Spend:0 [1000 --> 1000]
 
-        Assert.AreEqual (tableHost.TableHost.CashPot, 5000);                                    // Check POT == 5000
+        Assert.AreEqual (tableHost.TableHost.GetPrizePotAmounts ()[0], 5000);                                    // Check POT == 5000
 
         // THE-FLOP
         Assert.IsTrue (tableHost.TableHost.CurrentGamePhase == PokerGamePhaseEnum.THE_FLOP);        // Proceed to THE FLOP.

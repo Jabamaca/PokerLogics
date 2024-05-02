@@ -29,7 +29,8 @@ namespace TCSHoldEmPoker.Network.Define {
         PLAYER_BET_FOLD                 = 0x000F,
 
         // Win Condition Events
-        TABLE_GATHER_WAGERS             = 0x0010,
+        UPDATE_MAIN_PRIZE_POT           = 0x0010,
+        CREATE_SIDE_PRIZE_POT           = 0x0011,
         ALL_PLAYER_CARDS_REVEAL         = 0x0012,
         PLAYER_WIN                      = 0x0013,
     }

@@ -53,7 +53,8 @@ public class TestingPokerGameHost {
         _tableHost.DidPlayerBetRaiseAllIn += DidPlayerBetRaiseAllIn;
         _tableHost.DidPlayerFold += DidPlayerFold;
 
-        _tableHost.DidGatherWagersToPot += DidGatherWagersToPot;
+        _tableHost.DidUpdateMainPrizePot += DidUpdateMainPrizePot;
+        _tableHost.DidCreateSidePrizePot += DidCreateSidePrizePot;
         _tableHost.DidRevealAllHands += DidRevealAllHands;
         _tableHost.DidPlayerWin += DidPlayerWin;
     }
@@ -78,7 +79,8 @@ public class TestingPokerGameHost {
         _tableHost.DidPlayerBetRaiseAllIn -= DidPlayerBetRaiseAllIn;
         _tableHost.DidPlayerFold -= DidPlayerFold;
 
-        _tableHost.DidGatherWagersToPot -= DidGatherWagersToPot;
+        _tableHost.DidUpdateMainPrizePot -= DidUpdateMainPrizePot;
+        _tableHost.DidCreateSidePrizePot -= DidCreateSidePrizePot;
         _tableHost.DidRevealAllHands -= DidRevealAllHands;
         _tableHost.DidPlayerWin -= DidPlayerWin;
     }
@@ -192,8 +194,12 @@ public class TestingPokerGameHost {
 
     #region Win Condition Delegates
 
-    private void DidGatherWagersToPot (int gameTableID, int newCashPot) {
-        Debug.Log (gameTableID + " GATHER_POT New Cash Pot:" + newCashPot);
+    private void DidUpdateMainPrizePot (int gameTableID, int wagerPerPlayer) {
+        Debug.Log (gameTableID + " GATHER_POT Update Main Pot: WAGER PER PLAYER = " + wagerPerPlayer);
+    }
+
+    private void DidCreateSidePrizePot (int gameTableID, int wagerPerPlayer) {
+        Debug.Log (gameTableID + " GATHER_POT Create Side Pot: WAGER PER PLAYER = " + wagerPerPlayer);
     }
 
     private void DidRevealAllHands (int gameTableID, IReadOnlyDictionary<int, IReadOnlyList<PokerCard>> hands) {

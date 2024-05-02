@@ -21,7 +21,10 @@ namespace TCSHoldEmPoker.Models {
 
             _minimumWager = tableStateData.minimumWager;
             _currentTableStake = tableStateData.currentTableStake;
-            _cashPot = tableStateData.cashPot;
+            _mainPrizePot = new (tableStateData.mainPrizeStateData);
+            foreach (var sidePrizePotData in tableStateData.sidePrizeStateDataList) {
+                _sidePrizePots.Add (new (sidePrizePotData));
+            }
 
             _currentTurnSeatIndex = tableStateData.currentTurnPlayerIndex;
             int seatIndex = 0;
@@ -75,7 +78,8 @@ namespace TCSHoldEmPoker.Models {
         public void StartNewAnte () {
             RemoveCommunityCards ();
             ReadyPlayersForAnte ();
-            _cashPot = 0;
+            _sidePrizePots.Clear ();
+            _mainPrizePot = new PrizePotModel (prizeAmount: 0);
         }
 
         public void SetGamePhase (PokerGamePhaseEnum gamePhase) {
@@ -89,7 +93,8 @@ namespace TCSHoldEmPoker.Models {
 
         public void EndAnte () {
             RemoveCommunityCards ();
-            _cashPot = 0;
+            _sidePrizePots.Clear ();
+            _mainPrizePot = null;
         }
 
         #endregion
@@ -113,13 +118,17 @@ namespace TCSHoldEmPoker.Models {
 
         #region Chips Related Methods
 
-        public void GatherWagersToPot (int newCashPot) {
+        public void UpdateMainPrizePot (int wagerPerPlayer) {
             for (int i = 0; i < TABLE_CAPACITY; i++) {
-                _playerSeats[i].CollectWageredChips (); // Remove seat wagers.
+                int collectedWager = _playerSeats[i].CollectWageredChips (wagerPerPlayer);
+                _mainPrizePot.AddPrizeToPot (collectedWager);
             }
+        }
 
-            _currentTableStake = 0;
-            _cashPot = newCashPot;
+        public void CreateSidePrizePot (int wagerPerPlayer) {
+            UpdateMainPrizePot (wagerPerPlayer);
+            _sidePrizePots.Add (_mainPrizePot);
+            _mainPrizePot = new PrizePotModel (prizeAmount: 0);
         }
 
         public void PlayerCheck (int playerID) {

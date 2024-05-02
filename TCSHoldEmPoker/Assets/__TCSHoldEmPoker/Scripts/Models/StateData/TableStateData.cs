@@ -12,7 +12,8 @@ namespace TCSHoldEmPoker.Data {
         // Wagering Data
         public Int32 minimumWager;
         public Int32 currentTableStake;
-        public Int32 cashPot;
+        public PrizePotStateData mainPrizeStateData;
+        public List<PrizePotStateData> sidePrizeStateDataList;
 
         // Turning Data
         public List<SeatStateData> seatStateDataOrder;
@@ -31,11 +32,12 @@ namespace TCSHoldEmPoker.Data {
 
             if (this.minimumWager != other.minimumWager ||
                 this.currentTableStake != other.currentTableStake ||
-                this.cashPot != other.cashPot ||
+                !this.mainPrizeStateData.Equals (other.mainPrizeStateData) ||
+                !ListUtils.CheckEqualsOrder (this.sidePrizeStateDataList, other.sidePrizeStateDataList) ||
                 this.currentTurnPlayerIndex != other.currentTurnPlayerIndex ||
-                !ListUtils.CheckEquals (this.seatStateDataOrder, other.seatStateDataOrder) ||
+                !ListUtils.CheckEqualsOrder (this.seatStateDataOrder, other.seatStateDataOrder) ||
                 this.currentGamePhase != other.currentGamePhase ||
-                !ListUtils.CheckEquals (this.communityCardsOrder, other.communityCardsOrder)) {
+                !ListUtils.CheckEqualsOrder (this.communityCardsOrder, other.communityCardsOrder)) {
 
                 return false;
             }

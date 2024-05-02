@@ -182,8 +182,13 @@ namespace TCSHoldEmPoker.Network.Data {
                     return;
                 }
                 // WIN CONDITION
-                case NetworkActivityID.POKER_GAME_EVENT_TABLE_GATHER_WAGERS: {
-                    PokerGameEventByteConverter.BytesToPokerGameEventTableGatherWagers (deframedDataBytes, ref currentDataIndex, out var evt);
+                case NetworkActivityID.POKER_GAME_EVENT_TABLE_UPDATE_MAIN_PRIZE: {
+                    PokerGameEventByteConverter.BytesToPokerGameEventTableUpdateMainPrize (deframedDataBytes, ref currentDataIndex, out var evt);
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
+                }
+                case NetworkActivityID.POKER_GAME_EVENT_TABLE_CREATE_SIDE_PRIZE: {
+                    PokerGameEventByteConverter.BytesToPokerGameEventTableCreateSidePrize (deframedDataBytes, ref currentDataIndex, out var evt);
                     GlobalObserver.NotifyObservers (evt);
                     return;
                 }

@@ -19,7 +19,8 @@ namespace TCSHoldEmPoker.Models {
         protected int _minimumWager;
         public int MinimumWager => _minimumWager;
         protected int _currentTableStake = 0;
-        protected int _cashPot = 0;
+        protected PrizePotModel _mainPrizePot;
+        protected readonly List<PrizePotModel> _sidePrizePots = new List<PrizePotModel> ();
 
         // Turning Properties
         protected readonly TableSeatModel[] _playerSeats = new TableSeatModel[TABLE_CAPACITY];
@@ -37,8 +38,18 @@ namespace TCSHoldEmPoker.Models {
         #region Displayable Info Methods
 
         public PokerGamePhaseEnum CurrentGamePhase => _currentGamePhase;
-        public int CashPot => _cashPot;
         public PokerCard[] CommunityCards => _communityCards.Clone () as PokerCard[];
+
+        public List<int> GetPrizePots () {
+            List<int> returnList = new ();
+
+            returnList.Add (_mainPrizePot.prizeAmount);
+            foreach (var sidePrizePot in _sidePrizePots) {
+                returnList.Add (sidePrizePot.prizeAmount);
+            }
+
+            return returnList;
+        }
 
         public bool TryGetPlayerIsPlaying (int playerID, out bool isPlaying) {
             if (FindSeatWithPlayerID (playerID, out var seat)) {
@@ -102,6 +113,17 @@ namespace TCSHoldEmPoker.Models {
             return GetPlayerIDAtIndex (_currentTurnSeatIndex);
         }
 
+        public IReadOnlyList<int> GetPrizePotAmounts () {
+            List<int> returnList = new ();
+
+            foreach (var sidePrizePot in _sidePrizePots)
+                returnList.Add (sidePrizePot.prizeAmount);
+
+            returnList.Add (_mainPrizePot.prizeAmount);
+
+            return returnList;
+        }
+
         #endregion
 
         #region Table-Seat Utility Methods
@@ -116,6 +138,18 @@ namespace TCSHoldEmPoker.Models {
 
             seat = null;
             return false;
+        }
+
+        protected IReadOnlyList<int> GetPlayerIDsWithChips () {
+            List<int> returnList = new ();
+
+            foreach (var seat in _playerSeats) {
+                if (seat.SeatedPlayerChips > 0 && seat.IsPlaying) {
+                    returnList.Add (seat.SeatedPlayerID);
+                }
+            }
+
+            return returnList;
         }
 
         protected void RemoveCommunityCards () {
@@ -134,6 +168,22 @@ namespace TCSHoldEmPoker.Models {
             }
         }
 
+        protected bool GetSortedAllInSeats (out IReadOnlyList<TableSeatModel> sortedAllInSeats) {
+            List<TableSeatModel> allInSeats = new ();
+
+            foreach (var seat in _playerSeats) {
+                if (seat.IsAllIn) {
+                    allInSeats.Add (seat);
+                }
+            }
+            allInSeats.Sort ((s1, s2) => {
+                return s1.CurrentWager.CompareTo (s2.CurrentWager);
+            });
+
+            sortedAllInSeats = allInSeats;
+            return sortedAllInSeats.Count > 0;
+        }
+
         #endregion
 
         #region Game State Methods
@@ -149,12 +199,20 @@ namespace TCSHoldEmPoker.Models {
             List<PokerCard> cardOrder = new ();
             cardOrder.AddRange (_communityCards);
 
+            List<PrizePotStateData> sidePrizePotStateOrder = new ();
+            foreach (var sidePrizePot in _sidePrizePots) {
+                if (sidePrizePot != null) {
+                    sidePrizePotStateOrder.Add (sidePrizePot.ConvertToStateData ());
+                }
+            }
+
             return new TableStateData {
                 minimumWager = _minimumWager,
                 currentTableStake = _currentTableStake,
-                cashPot = _cashPot,
+                mainPrizeStateData = _mainPrizePot.ConvertToStateData (),
+                sidePrizeStateDataList = sidePrizePotStateOrder,
 
-                currentTurnPlayerIndex = (byte)_currentTurnSeatIndex,
+                currentTurnPlayerIndex = (short)_currentTurnSeatIndex,
                 seatStateDataOrder = seatStateOrder,
 
                 currentGamePhase = _currentGamePhase,

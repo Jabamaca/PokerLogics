@@ -482,28 +482,55 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Win Condition Game Events Conversion
 
-        // TABLE GATHER WAGERS
+        // UPDATE MAIN PRIZE POT
 
-        public static void BytesToPokerGameEventTableGatherWagers (byte[] bytes, ref int currentDataIndex, out TableGatherWagersGameEvent evt) {
-            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventTableGatherWagersUniqueDataProcess, out evt);
+        public static void BytesToPokerGameEventTableUpdateMainPrize (byte[] bytes, ref int currentDataIndex, out UpdateMainPrizePotGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventTableUpdateMainPrizeUniqueDataProcess, out evt);
         }
 
-        private static void PokerGameEventTableGatherWagersUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out TableGatherWagersGameEvent evt) {
+        private static void PokerGameEventTableUpdateMainPrizeUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out UpdateMainPrizePotGameEvent evt) {
             // New Cash Pot
             ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var newCashPot);
 
             evt = new () {
-                newCashPot = newCashPot,
+                wagerPerPlayer = newCashPot,
             };
         }
 
-        public static byte[] BytesFromPokerGameEventTableGatherWagers (TableGatherWagersGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_GATHER_WAGERS;
+        public static byte[] BytesFromPokerGameEventTableUpdateMainPrize (UpdateMainPrizePotGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
                     // New Cash Pot
-                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.newCashPot));
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.wagerPerPlayer));
+
+                    return uniqueByteList;
+                });
+        }
+
+        // CREATE SIDE PRIZE POT
+
+        public static void BytesToPokerGameEventTableCreateSidePrize (byte[] bytes, ref int currentDataIndex, out CreateSidePrizePotGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventTableCreateSidePrizeUniqueDataProcess, out evt);
+        }
+
+        private static void PokerGameEventTableCreateSidePrizeUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out CreateSidePrizePotGameEvent evt) {
+            // New Cash Pot
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var newCashPot);
+
+            evt = new () {
+                wagerPerPlayer = newCashPot,
+            };
+        }
+
+        public static byte[] BytesFromPokerGameEventTableCreateSidePrize (CreateSidePrizePotGameEvent evt) {
+            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // New Cash Pot
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.wagerPerPlayer));
 
                     return uniqueByteList;
                 });

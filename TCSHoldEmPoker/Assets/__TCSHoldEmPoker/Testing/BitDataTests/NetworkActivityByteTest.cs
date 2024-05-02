@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Activity;
@@ -24,7 +25,20 @@ public class NetworkActivityByteTest {
         TableStateData tsd1 = new () {
             minimumWager = 1500,
             currentTableStake = 2500,
-            cashPot = 11500,
+            mainPrizeStateData = new PrizePotStateData {
+                prizeAmount = 6000,
+                qualifiedPlayerIDs = new List<Int32> {
+                    2345, 9292, 1818, 8008
+                },
+            },
+            sidePrizeStateDataList = new List<PrizePotStateData> {
+                new PrizePotStateData {
+                    prizeAmount = 7500,
+                qualifiedPlayerIDs = new List<Int32> {
+                    2345, 9292, 1818, 8008, 6654
+                },
+                }
+            },
             seatStateDataOrder = new () {
                 new () {
                     seatedPlayerStateData = new () {
@@ -114,7 +128,12 @@ public class NetworkActivityByteTest {
             gameTableID = 7410112,
             updatedTableStateData = tsd1,
         };
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE;
+        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE_BASE;
+        expectedSize += tsd1.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
+        foreach (var sidePrizeData in tsd1.sidePrizeStateDataList) {
+            expectedSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
+            expectedSize += sidePrizeData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
+        }
         byte[] updateBytes = NetworkActivityByteConverter.BytesFromPokerGameStateUpdate (stateUpdate1);
         TestNetworkActivityByteArray (updateBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_STATE_UPDATE);

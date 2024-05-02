@@ -53,7 +53,8 @@ public class FakeServer : MonoBehaviour {
         _gameCoordinator.DidPlayerBetRaiseAllIn += DidPlayerBetRaiseAllIn;
         _gameCoordinator.DidPlayerFold += DidPlayerFold;
 
-        _gameCoordinator.DidGatherWagersToPot += DidGatherWagersToPot;
+        _gameCoordinator.DidUpdateMainPrizePot += DidUpdateMainPrizePot;
+        _gameCoordinator.DidCreateSidePrizePot += DidCreateSidePrizePot;
         _gameCoordinator.DidRevealAllHands += DidRevealAllHands;
         _gameCoordinator.DidPlayerWin += DidPlayerWin;
     }
@@ -78,7 +79,8 @@ public class FakeServer : MonoBehaviour {
         _gameCoordinator.DidPlayerBetRaiseAllIn -= DidPlayerBetRaiseAllIn;
         _gameCoordinator.DidPlayerFold -= DidPlayerFold;
 
-        _gameCoordinator.DidGatherWagersToPot -= DidGatherWagersToPot;
+        _gameCoordinator.DidUpdateMainPrizePot -= DidUpdateMainPrizePot;
+        _gameCoordinator.DidCreateSidePrizePot -= DidCreateSidePrizePot;
         _gameCoordinator.DidRevealAllHands -= DidRevealAllHands;
         _gameCoordinator.DidPlayerWin -= DidPlayerWin;
     }
@@ -225,10 +227,17 @@ public class FakeServer : MonoBehaviour {
 
     #region Win Condition Delegates
 
-    private void DidGatherWagersToPot (int gameTableID, int newCashPot) {
-        GlobalObserver.NotifyObservers (new TableGatherWagersGameEvent () {
+    private void DidUpdateMainPrizePot (int gameTableID, int wagerPerPlayer) {
+        GlobalObserver.NotifyObservers (new UpdateMainPrizePotGameEvent () {
             gameTableID = gameTableID,
-            newCashPot = newCashPot,
+            wagerPerPlayer = wagerPerPlayer,
+        });
+    }
+
+    private void DidCreateSidePrizePot (int gameTableID, int wagerPerPlayer) {
+        GlobalObserver.NotifyObservers (new CreateSidePrizePotGameEvent () {
+            gameTableID = gameTableID,
+            wagerPerPlayer = wagerPerPlayer,
         });
     }
 
