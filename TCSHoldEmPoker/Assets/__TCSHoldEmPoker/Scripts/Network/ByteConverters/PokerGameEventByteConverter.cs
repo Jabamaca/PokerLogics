@@ -80,7 +80,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerJoin (PlayerJoinGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
@@ -109,7 +109,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerLeave (PlayerLeaveGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();

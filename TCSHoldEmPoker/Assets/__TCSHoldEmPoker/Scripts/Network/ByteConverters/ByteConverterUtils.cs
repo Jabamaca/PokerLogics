@@ -100,23 +100,42 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #endregion
 
-        // Sizes of Game Events
-        // COMMON DATA
-        public const int SIZEOF_POKER_GAME_EVENT_COMMON_DATA =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                             // *** UNIQUE DATA (If Any) ***
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
-        // Connectivity
-        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Buy-In Chips
-        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // Player ID
-        // Game Progression
+        #region Poker Game Event Byte Size
+
+        private static int BaseSizeOf (PokerGameEvent evt) {
+            int byteSize = 0;
+            byteSize += SIZEOF_NETWORK_ACTIVITY_START;                                  // START Network Activity Stream
+            byteSize += SizeOf (NetworkActivityID.SAMPLE);                              // Network Activity ID
+            byteSize += sizeof (Int32);                                                 // Game ID
+            /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                                 // *** UNIQUE DATA (If Any) ***
+            byteSize += SIZEOF_NETWORK_ACTIVITY_END;                                    // END Network Activity Stream
+
+            return byteSize;
+        }
+
+        #region Connectivity
+
+        public static int SizeOf (PlayerJoinGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Buy-In Chips
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerLeaveGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+
+            return byteSize;
+        }
+
+        #endregion
+
+        #region Game Progression
+
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_START =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE =
@@ -136,7 +155,11 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             SIZEOF_CARD_DATA +                                                      // Card Data
             sizeof (Int16);                                                         // Card Position (Flop 1-2-3, Turn, River)
-        // Player Action
+
+        #endregion
+
+        #region Player Action
+
         public const int SIZEOF_POKER_GAME_EVENT_BET_BLIND =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
@@ -155,7 +178,11 @@ namespace TCSHoldEmPoker.Network.Data {
         public const int SIZEOF_POKER_GAME_EVENT_BET_FOLD =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32);                                                         // Player ID
-        // Win Condition
+
+        #endregion
+
+        #region Win Condition
+
         public const int SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32);                                                         // Updated Prize Total
@@ -173,6 +200,10 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
             sizeof (Int32);                                                         // Chips Won
+
+        #endregion
+
+        #endregion
 
         #region Poker Game Input Byte Size
 

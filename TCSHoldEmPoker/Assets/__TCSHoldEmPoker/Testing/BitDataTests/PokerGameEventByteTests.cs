@@ -33,7 +33,7 @@ public class PokerGameEventByteTests {
             buyInChips = 1000000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_JOIN;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerJoin (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_JOIN);
@@ -53,7 +53,7 @@ public class PokerGameEventByteTests {
             playerID = 5342,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_LEAVE;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerLeave (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_LEAVE);
