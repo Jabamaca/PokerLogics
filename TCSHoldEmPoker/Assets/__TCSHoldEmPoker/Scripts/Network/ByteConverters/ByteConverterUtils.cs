@@ -46,9 +46,6 @@ namespace TCSHoldEmPoker.Network.Data {
 
             return byteSize;
         }
-        public const int SIZEOF_PLAYER_STATE_DATA =
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Chips in Hand
 
         public static int SizeOf (PlayerStateData playerStateData) {
             int byteSize = 0;
@@ -58,10 +55,15 @@ namespace TCSHoldEmPoker.Network.Data {
             return byteSize;
         }
 
-        public const int SIZEOF_SEAT_STATE_DATA =
-            SIZEOF_PLAYER_STATE_DATA +                                              // Seated Player State Data
-            sizeof (byte) +                                                         // BoolSet #1 (didCheck, isPlaying)
-            sizeof (Int32);                                                         // Current Wager
+        public static int SizeOf (SeatStateData seatStateData) {
+            int byteSize = 0;
+            byteSize += SizeOf (seatStateData.seatedPlayerStateData);               // Seated Player State Data
+            byteSize += sizeof (byte);                                              // BoolSet #1 (didCheck, isPlaying)
+            byteSize += sizeof (Int32);                                             // Current Wager
+
+            return byteSize;
+        }
+
         public const int SIZEOF_TABLE_STATE_DATA_BASE =
             sizeof (Int32) +                                                        // Minimum Wager
             sizeof (Int32) +                                                        // Current Table Stake

@@ -80,10 +80,10 @@ public class GameModelByteTests {
         };
 
         byte[] ssdBytes = GameModelByteConverter.BytesFromSeatStateData (ssd1);
-        Assert.AreEqual (ssdBytes.Length, ByteConverterUtils.SIZEOF_SEAT_STATE_DATA);
+        Assert.AreEqual (ssdBytes.Length, ByteConverterUtils.SizeOf (ssd1));
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToSeatStateData (ssdBytes, ref currentDataIndex, out var ssd2);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_SEAT_STATE_DATA);
+        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SizeOf (ssd1));
 
         Assert.IsTrue (ssd1.Equals (ssd2));
     }

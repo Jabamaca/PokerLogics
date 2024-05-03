@@ -96,7 +96,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPlayerStateData (PlayerStateData playerStateData) {
-            byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (playerStateData)];
 
             int currentDataIndex = 0;
             // Player ID
@@ -130,7 +130,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromSeatStateData (SeatStateData seatStateData) {
-            byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_SEAT_STATE_DATA];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (seatStateData)];
 
             int currentDataIndex = 0;
             // Seated Player State Data
