@@ -68,7 +68,7 @@ public class PokerGameInputByteTests {
             playerID = 8999,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK;
+        int expectedSize = ByteConverterUtils.SizeOf (input1);
         byte[] inputBytes = PokerGameInputByteConverter.BytesFromPokerGameInputPlayerActionBetCheck (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK);
@@ -86,7 +86,7 @@ public class PokerGameInputByteTests {
             playerID = 9096,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL;
+        int expectedSize = ByteConverterUtils.SizeOf (input1);
         byte[] inputBytes = PokerGameInputByteConverter.BytesFromPokerGameInputPlayerActionBetCall (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL);
@@ -105,7 +105,7 @@ public class PokerGameInputByteTests {
             newStake = 70000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE;
+        int expectedSize = ByteConverterUtils.SizeOf (input1);
         byte[] inputBytes = PokerGameInputByteConverter.BytesFromPokerGameInputPlayerActionBetRaise (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE);
@@ -124,7 +124,7 @@ public class PokerGameInputByteTests {
             playerID = 6969,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD;
+        int expectedSize = ByteConverterUtils.SizeOf (input1);
         byte[] inputBytes = PokerGameInputByteConverter.BytesFromPokerGameInputPlayerActionBetFold (input1);
         TestPokerGameInputByteArray (inputBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD);

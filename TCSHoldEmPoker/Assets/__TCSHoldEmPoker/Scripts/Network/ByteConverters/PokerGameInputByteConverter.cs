@@ -133,7 +133,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameInputPlayerActionBetCheck (PlayerBetCheckActionGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK;
+            int eventSize = ByteConverterUtils.SizeOf (input);
             return BytesFromPokerGameInput (input, eventSize,
                 uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();
@@ -156,7 +156,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameInputPlayerActionBetCall (PlayerBetCallActionGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL;
+            int eventSize = ByteConverterUtils.SizeOf (input);
             return BytesFromPokerGameInput (input, eventSize,
                 uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();
@@ -182,7 +182,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameInputPlayerActionBetRaise (PlayerBetRaiseActionGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE;
+            int eventSize = ByteConverterUtils.SizeOf (input);
             return BytesFromPokerGameInput (input, eventSize,
                 uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();
@@ -206,7 +206,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameInputPlayerActionBetFold (PlayerBetFoldActionGameInput input) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD;
+            int eventSize = ByteConverterUtils.SizeOf (input);
             return BytesFromPokerGameInput (input, eventSize,
                 uniqueDataProcess: (input) => {
                     List<byte> uniqueByteList = new ();

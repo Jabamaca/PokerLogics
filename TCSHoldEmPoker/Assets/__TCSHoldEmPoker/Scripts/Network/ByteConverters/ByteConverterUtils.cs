@@ -209,15 +209,34 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Player Action
 
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_RAISE =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA +                                   // Input Data Signature and Common Data
-            sizeof (Int32);                                                         // New Stake
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
+        public static int SizeOf (PlayerBetCheckActionGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetCallActionGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetRaiseActionGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // New Stake
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetFoldActionGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+
+            return byteSize;
+        }
 
         #endregion
 
