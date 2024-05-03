@@ -59,10 +59,10 @@ public class GameModelByteTests {
         };
 
         byte[] psdBytes = GameModelByteConverter.BytesFromPlayerStateData (psd1);
-        Assert.AreEqual (psdBytes.Length, ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA);
+        Assert.AreEqual (psdBytes.Length, ByteConverterUtils.SizeOf (psd1));
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToPlayerStateData (psdBytes, ref currentDataIndex, out var psd2);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_PLAYER_STATE_DATA);
+        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SizeOf (psd2));
 
         Assert.IsTrue (psd1.Equals (psd2));
     }

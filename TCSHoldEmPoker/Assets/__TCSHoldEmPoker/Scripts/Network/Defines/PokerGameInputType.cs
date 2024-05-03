@@ -1,7 +1,7 @@
 using System;
 
 namespace TCSHoldEmPoker.Network.Define {
-    public enum PokerGameInputType : Int16 {
+    public enum PokerGameInputType {
     
         NULL                                    = 0x0000,
 

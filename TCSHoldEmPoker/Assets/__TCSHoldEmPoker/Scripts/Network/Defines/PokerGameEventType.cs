@@ -1,7 +1,7 @@
 using System;
 
 namespace TCSHoldEmPoker.Network.Define {
-    public enum PokerGameEventType : Int16 {
+    public enum PokerGameEventType {
     
         NULL                            = 0x0000,
 

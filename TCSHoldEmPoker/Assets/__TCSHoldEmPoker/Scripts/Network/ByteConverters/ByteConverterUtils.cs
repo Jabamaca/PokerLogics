@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
 using TCSHoldEmPoker.Network.Define;
@@ -36,17 +37,27 @@ namespace TCSHoldEmPoker.Network.Data {
         public const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
 
         // Sizes of Structured Data
+
         public static int SizeOf (PokerHand pokerHand) {
             int byteSize = 0;
-            byteSize += SizeOf (pokerHand.HandRank);
+            byteSize += SizeOf (pokerHand.HandRank);                                // Hand Rank
             foreach (var card in pokerHand.CardOrder)
-                byteSize += SizeOf (card);
+                byteSize += SizeOf (card);                                          // Card Order [ENUMERATE]
 
             return byteSize;
         }
         public const int SIZEOF_PLAYER_STATE_DATA =
             sizeof (Int32) +                                                        // Player ID
             sizeof (Int32);                                                         // Chips in Hand
+
+        public static int SizeOf (PlayerStateData playerStateData) {
+            int byteSize = 0;
+            byteSize += sizeof (Int32);                                             // Player ID
+            byteSize += sizeof (Int32);                                             // Chips in Hand
+
+            return byteSize;
+        }
+
         public const int SIZEOF_SEAT_STATE_DATA =
             SIZEOF_PLAYER_STATE_DATA +                                              // Seated Player State Data
             sizeof (byte) +                                                         // BoolSet #1 (didCheck, isPlaying)
