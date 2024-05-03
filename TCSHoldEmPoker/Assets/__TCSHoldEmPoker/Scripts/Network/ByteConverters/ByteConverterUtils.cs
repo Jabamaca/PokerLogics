@@ -41,7 +41,8 @@ namespace TCSHoldEmPoker.Network.Data {
         public static int SizeOf (PokerHand pokerHand) {
             int byteSize = 0;
             byteSize += SizeOf (pokerHand.HandRank);                                    // Hand Rank
-            byteSize += SizeOf (PokerCard.BLANK) * HoldEmPokerDefines.POKER_HAND_SIZE;  // 5 Card Order
+            byteSize += 
+                SizeOf (PokerCard.BLANK) * HoldEmPokerDefines.POKER_HAND_SIZE;          // 5 Card Order
 
             return byteSize;
         }
@@ -73,17 +74,21 @@ namespace TCSHoldEmPoker.Network.Data {
             return byteSize;
         }
 
-        public const int SIZEOF_TABLE_STATE_DATA_BASE =
-            sizeof (Int32) +                                                        // Minimum Wager
-            sizeof (Int32) +                                                        // Current Table Stake
-            SIZEOF_PRIZE_POT_STATE_DATA_BASE +                                      // Main Prize Pot
-            /* (Qualified Player Count) * (Player ID) */                            // Main Prize Pot Qualified Players Data (Flexible number)
-            sizeof (Int16) +                                                        // Side Prize Pot Count
-            /* (Side Prize Pot Count) * [[VARIED PRIZE POT SIZE]]  */               // Side Prize Pots Data (Flexible number)
-            (SIZEOF_SEAT_STATE_DATA * HoldEmPokerDefines.POKER_TABLE_CAPACITY) +    // Seat State Data Order
-            SIZEOF_GAME_PHASE +                                                     // Current Game Phase
-            sizeof (Int16) +                                                        // Current Turn Seat Index
-            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);     // Community Card Order
+        public static int SizeOf (TableStateData tableStateData) {
+            int byteSize = 0;
+            byteSize += sizeof (Int32);                                                 // Minimum Wager
+            byteSize += sizeof (Int32);                                                 // Current Table Stake
+            byteSize += SizeOf (tableStateData.mainPrizeStateData);                     // Main Prize Pot
+            byteSize += sizeof (Int16);                                                 // Side Prize Pot Count
+            foreach (var sidePrizePot in tableStateData.sidePrizeStateDataList)
+                byteSize += SizeOf (sidePrizePot);                                      // Side Prize Pot [ENUMERATE]
+            byteSize += SizeOf (tableStateData.currentGamePhase);                       // Current Game Phase
+            byteSize += sizeof (Int16);                                                 // Current Turn Seat Index
+            byteSize += SizeOf (PokerCard.BLANK) * 
+                HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT;                          // Community Card Order
+
+            return byteSize;
+        }
 
         // Sizes of Game Events
         // COMMON DATA

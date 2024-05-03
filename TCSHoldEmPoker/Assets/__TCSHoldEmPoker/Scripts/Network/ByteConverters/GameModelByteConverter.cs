@@ -172,8 +172,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPrizePotStateData (PrizePotStateData prizePotStateData) {
-            int dataSize = ByteConverterUtils.SizeOf (prizePotStateData);
-            byte[] returnBytes = new byte[dataSize];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (prizePotStateData)];
 
             int currentIndex = 0;
             // Prize Amount
@@ -238,14 +237,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromTableStateData (TableStateData tableStateData) {
-            int dataSize = ByteConverterUtils.SIZEOF_TABLE_STATE_DATA_BASE;
-            dataSize += tableStateData.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-            foreach (var sidePrizeData in tableStateData.sidePrizeStateDataList) {
-                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
-                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER * sidePrizeData.qualifiedPlayerIDs.Count;
-            }
-
-            byte[] returnBytes = new byte[dataSize];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (tableStateData)];
 
             int currentDataIndex = 0;
             // Minimum Wager

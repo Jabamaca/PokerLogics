@@ -214,12 +214,7 @@ public class GameModelByteTests {
             }
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_TABLE_STATE_DATA_BASE;
-        expectedSize += tsd1.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-        foreach (var sidePrizeData in tsd1.sidePrizeStateDataList) {
-            expectedSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
-            expectedSize += sidePrizeData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-        }
+        int expectedSize = ByteConverterUtils.SizeOf (tsd1);
 
         byte[] tsdBytes = GameModelByteConverter.BytesFromTableStateData (tsd1);
         Assert.AreEqual (tsdBytes.Length, expectedSize);
