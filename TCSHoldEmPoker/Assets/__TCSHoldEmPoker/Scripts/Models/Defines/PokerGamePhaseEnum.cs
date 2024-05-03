@@ -1,5 +1,7 @@
 namespace TCSHoldEmPoker.Models.Define {
     public enum PokerGamePhaseEnum {
+        SAMPLE      = 0xFF,
+
         NULL        = 0x00,
         WAITING     = 0x10,
         PRE_FLOP    = 0x20,

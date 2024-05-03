@@ -1,20 +1,38 @@
 using System;
 using System.Collections.Generic;
 using TCSHoldEmPoker.Models.Define;
+using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class ByteConverterUtils {
 
         // Sizes of Basic Data
-        public const int SIZEOF_CARD_DATA = sizeof (byte);
-        public const int SIZEOF_HAND_RANK = sizeof (byte);
-        public const int SIZEOF_GAME_PHASE = sizeof (byte);
-        public const int SIZEOF_NETWORK_ACTIVITY_ID = sizeof (Int16);
-        public const int SIZEOF_NETWORK_ACTIVITY_START = sizeof (UInt16);
-        public const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
+
+        private const int SIZEOF_CARD_DATA = sizeof (byte);
+        public static int SizeOf (PokerCard pokerCard) {
+            return SIZEOF_CARD_DATA;
+        }
+
+        private const int SIZEOF_HAND_RANK = sizeof (byte);
+        public static int SizeOf (PokerHandRankEnum handRank) {
+            return SIZEOF_HAND_RANK;
+        }
+
+        private const int SIZEOF_GAME_PHASE = sizeof (byte);
+        public static int SizeOf (PokerGamePhaseEnum gamePhase) {
+            return SIZEOF_GAME_PHASE;
+        }
+
+        private const int SIZEOF_NETWORK_ACTIVITY_ID = sizeof (Int16);
+        public static int SizeOf (NetworkActivityID networkActivityID) {
+            return SIZEOF_NETWORK_ACTIVITY_ID;
+        }
 
         public const UInt16 NETWORK_ACTIVITY_START = 0xF99F;
+        public const int SIZEOF_NETWORK_ACTIVITY_START = sizeof (UInt16);
+
         public const UInt16 NETWORK_ACTIVITY_END = 0xF66F;
+        public const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
 
         // Sizes of Structured Data
         public const int SIZEOF_HAND_DATA =

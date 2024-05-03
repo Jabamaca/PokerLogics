@@ -9,8 +9,8 @@ namespace TCSHoldEmPoker.Network.Data {
         #region Methods
 
         public static void BytesToPokerGameStateUpdate (byte[] bytes, ref int currentDataIndex, out PokerGameStateUpdate stateUpdate) {
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;      // START of Network Activity Signature
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_ID;         // Network Activity ID
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;       // START of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SizeOf (NetworkActivityID.SAMPLE);   // Network Activity ID
             // Game Table ID
             ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var gameTableID);
             // Updated Table State Data
@@ -20,7 +20,7 @@ namespace TCSHoldEmPoker.Network.Data {
                 gameTableID = gameTableID,
                 updatedTableStateData = updatedTableStateData,
             };
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;         // END of Network Activity Signature
         }
 
         public static byte[] BytesFromPokerGameStateUpdate (PokerGameStateUpdate stateUpdate) {

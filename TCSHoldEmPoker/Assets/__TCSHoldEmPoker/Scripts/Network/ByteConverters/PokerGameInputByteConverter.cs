@@ -19,8 +19,8 @@ namespace TCSHoldEmPoker.Network.Data {
             where INPUT : PokerGameInput {
 
             // COMMON DATA
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;      // START of Network Activity Signature
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_ID;         // Network Activity ID
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;       // START of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SizeOf (NetworkActivityID.SAMPLE);   // Network Activity ID
             // Game Table ID
             ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var gameTableID);
             // Player ID
@@ -29,7 +29,7 @@ namespace TCSHoldEmPoker.Network.Data {
             uniqueDataProcess (bytes, ref currentDataIndex, out input);
             input.gameTableID = gameTableID;
             input.playerID = playerID;
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;         // END of Network Activity Signature
         }
 
         private static byte[] BytesFromPokerGameInput<INPUT> (INPUT input, int eventSize, UniqueDataFromInputProcess<INPUT> uniqueDataProcess) 

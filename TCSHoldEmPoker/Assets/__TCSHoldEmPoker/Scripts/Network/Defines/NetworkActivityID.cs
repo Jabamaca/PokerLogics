@@ -1,8 +1,9 @@
 using System;
 
 namespace TCSHoldEmPoker.Network.Define {
-    public enum NetworkActivityID : Int16 {
-    
+    public enum NetworkActivityID {
+        SAMPLE                                          = 0xFFFF,
+
         NULL_PREFIX                                     = 0x0000,
         POKER_GAME_EVENT_PREFIX                         = 0x0100,
         POKER_GAME_INPUT_PREFIX                         = 0x0200,

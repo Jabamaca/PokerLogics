@@ -16,7 +16,7 @@ namespace TCSHoldEmPoker.Network.Data {
             CardValueEnum value = (CardValueEnum)(cardByte & 0xF0);     // 1st half-byte is value.
             CardSuitEnum suit = (CardSuitEnum)(cardByte & 0x0F);        // 2nd half-byte is suit.
             card = new PokerCard (suit, value);
-            currentDataIndex += ByteConverterUtils.SIZEOF_CARD_DATA;
+            currentDataIndex += ByteConverterUtils.SizeOf (card);
         }
 
         public static byte[] BytesFromPokerCard (PokerCard card) {
@@ -29,7 +29,7 @@ namespace TCSHoldEmPoker.Network.Data {
 
         public static void BytesToHandRank (byte[] bytes, ref int currentDataIndex, out PokerHandRankEnum handRank) {
             handRank = (PokerHandRankEnum)bytes[currentDataIndex];
-            currentDataIndex += ByteConverterUtils.SIZEOF_HAND_RANK;
+            currentDataIndex += ByteConverterUtils.SizeOf (handRank);
         }
 
         public static byte[] BytesFromHandRank (PokerHandRankEnum handRank) {
@@ -42,7 +42,7 @@ namespace TCSHoldEmPoker.Network.Data {
 
         public static void BytesToGamePhase (byte[] bytes, ref int currentDataIndex, out PokerGamePhaseEnum gamePhase) {
             gamePhase = (PokerGamePhaseEnum)bytes[currentDataIndex];
-            currentDataIndex += ByteConverterUtils.SIZEOF_GAME_PHASE;
+            currentDataIndex += ByteConverterUtils.SizeOf (PokerGamePhaseEnum.SAMPLE);
         }
 
         public static byte[] BytesFromGamePhase (PokerGamePhaseEnum gamePhase) {

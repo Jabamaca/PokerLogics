@@ -20,14 +20,14 @@ namespace TCSHoldEmPoker.Network.Data {
             where EVT : PokerGameEvent {
 
             // COMMON DATA
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;      // START of Network Activity Signature
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_ID;         // Network Activity ID
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_START;                   // START of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SizeOf (NetworkActivityID.SAMPLE);               // Network Activity ID
             // Game Table ID
             ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var gameTableID);
 
             uniqueDataProcess (bytes, ref currentDataIndex, out evt);
             evt.gameTableID = gameTableID;
-            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;        // END of Network Activity Signature
+            currentDataIndex += ByteConverterUtils.SIZEOF_NETWORK_ACTIVITY_END;                     // END of Network Activity Signature
         }
 
         private static byte[] BytesFromPokerGameEvent<EVT> (EVT evt, int eventSize, UniqueDataFromEventProcess<EVT> uniqueDataProcess) 

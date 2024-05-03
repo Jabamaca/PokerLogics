@@ -14,7 +14,7 @@ public class GameModelByteTests {
 
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToPokerCard (cardByte, ref currentDataIndex, out var cardTest);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_CARD_DATA);
+        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SizeOf (cardTest));
         Assert.AreEqual (cardTest.Value, CardValueEnum.FIVE);
         Assert.AreEqual (cardTest.Suit, CardSuitEnum.SPADES);
     }
@@ -26,8 +26,8 @@ public class GameModelByteTests {
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToPokerCard (cardByte, ref currentDataIndex, out var card2);
 
-        Assert.AreEqual (cardByte.Length, ByteConverterUtils.SIZEOF_CARD_DATA);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_CARD_DATA);
+        Assert.AreEqual (cardByte.Length, ByteConverterUtils.SizeOf (card1));
+        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SizeOf (card2));
         Assert.IsTrue (card1.Equals (card2));
     }
 

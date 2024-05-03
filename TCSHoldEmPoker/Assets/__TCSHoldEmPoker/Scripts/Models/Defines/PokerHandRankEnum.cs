@@ -1,5 +1,7 @@
 namespace TCSHoldEmPoker.Models.Define {
     public enum PokerHandRankEnum {
+        SAMPLE          = 0xFF,
+
         NULL            = 0x00,
         HIGH_CARD       = 0x01,
         ONE_PAIR        = 0x02,
