@@ -67,7 +67,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerHand (PokerHand hand) {
-            byte[] returnBytes = new byte[ByteConverterUtils.SIZEOF_HAND_DATA];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (hand)];
 
             int currentDataIndex = 0;
             // Hand Rank

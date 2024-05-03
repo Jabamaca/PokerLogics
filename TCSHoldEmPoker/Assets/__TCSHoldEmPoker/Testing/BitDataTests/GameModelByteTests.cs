@@ -43,10 +43,10 @@ public class GameModelByteTests {
 
         PokerHand hand1 = PokerHandFactory.GetHighestPokerHandWithCardSet (cards);
         byte[] handBytes = GameModelByteConverter.BytesFromPokerHand (hand1);
-        Assert.AreEqual (handBytes.Length, ByteConverterUtils.SIZEOF_HAND_DATA);
+        Assert.AreEqual (handBytes.Length, ByteConverterUtils.SizeOf (hand1));
         int currentDataIndex = 0;
         GameModelByteConverter.BytesToPokerHand (handBytes, ref currentDataIndex, out var hand2);
-        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SIZEOF_HAND_DATA);
+        Assert.AreEqual (currentDataIndex, ByteConverterUtils.SizeOf (hand1));
 
         Assert.AreEqual (hand1.CompareTo (hand2), 0); // Check Compare equal.
     }
