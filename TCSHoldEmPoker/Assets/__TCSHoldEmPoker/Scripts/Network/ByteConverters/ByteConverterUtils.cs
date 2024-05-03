@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using TCSHoldEmPoker.Data;
 using TCSHoldEmPoker.Models;
 using TCSHoldEmPoker.Models.Define;
+using TCSHoldEmPoker.Network.Activity;
+using TCSHoldEmPoker.Network.Activity.PokerGameInputs;
+using TCSHoldEmPoker.Network.Activity.PokerGameEvents;
 using TCSHoldEmPoker.Network.Define;
 
 namespace TCSHoldEmPoker.Network.Data {
     public static class ByteConverterUtils {
 
-        // Sizes of Basic Data
+        #region Basic Data Byte Size
 
         private const int SIZEOF_CARD_DATA = sizeof (byte);
         public static int SizeOf (PokerCard pokerCard) {
@@ -36,7 +39,9 @@ namespace TCSHoldEmPoker.Network.Data {
         public const UInt16 NETWORK_ACTIVITY_END = 0xF66F;
         public const int SIZEOF_NETWORK_ACTIVITY_END = sizeof (UInt16);
 
-        // Sizes of Structured Data
+        #endregion
+
+        #region Structured Data Byte Size
 
         public static int SizeOf (PokerHand pokerHand) {
             int byteSize = 0;
@@ -81,7 +86,10 @@ namespace TCSHoldEmPoker.Network.Data {
             byteSize += SizeOf (tableStateData.mainPrizeStateData);                     // Main Prize Pot
             byteSize += sizeof (Int16);                                                 // Side Prize Pot Count
             foreach (var sidePrizePot in tableStateData.sidePrizeStateDataList)
-                byteSize += SizeOf (sidePrizePot);                                      // Side Prize Pot [ENUMERATE]
+                byteSize += SizeOf (sidePrizePot);                                      // Side Prize Pots [ENUMERATE]
+            byteSize += sizeof (Int16);                                                 // Table Seat Count
+            foreach (var seatStateData in tableStateData.seatStateDataOrder)
+                byteSize += SizeOf (seatStateData);                                     // Table Seats [ENUMERATE]
             byteSize += SizeOf (tableStateData.currentGamePhase);                       // Current Game Phase
             byteSize += sizeof (Int16);                                                 // Current Turn Seat Index
             byteSize += SizeOf (PokerCard.BLANK) * 
@@ -89,6 +97,8 @@ namespace TCSHoldEmPoker.Network.Data {
 
             return byteSize;
         }
+
+        #endregion
 
         // Sizes of Game Events
         // COMMON DATA
@@ -164,21 +174,41 @@ namespace TCSHoldEmPoker.Network.Data {
             sizeof (Int32) +                                                        // Player ID
             sizeof (Int32);                                                         // Chips Won
 
-        // Sizes of Game Input
-        // COMMON DATA
-        public const int SIZEOF_POKER_GAME_INPUT_COMMON_DATA =
-            SIZEOF_NETWORK_ACTIVITY_START +                                         // START Network Activity Stream
-            SIZEOF_NETWORK_ACTIVITY_ID +                                            // Network Activity ID
-            sizeof (Int32) +                                                        // Game ID
-            sizeof (Int32) +                                                        // Player ID
-            /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                             // *** UNIQUE DATA (If Any) ***
-            SIZEOF_NETWORK_ACTIVITY_END;                                            // END Network Activity Stream
-        // Connectivity
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_JOIN =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA +                                   // Input Data Signature and Common Data
-            sizeof (Int32);                                                         // Buy-In Chips
-        public const int SIZEOF_POKER_GAME_INPUT_PLAYER_REQUEST_LEAVE =
-            SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
+        #region Poker Game Input Byte Size
+
+        private static int BaseSizeOf (PokerGameInput gameInput) {
+            int byteSize = 0;
+            byteSize += SIZEOF_NETWORK_ACTIVITY_START;                                  // START Network Activity Stream
+            byteSize += SizeOf (NetworkActivityID.SAMPLE);                              // Network Activity ID
+            byteSize += sizeof (Int32);                                                 // Game ID
+            byteSize += sizeof (Int32);                                                 // Player ID
+            /* [[VARIOUS SIZE TOTAL OF UNIQUE DATA]] */                                 // *** UNIQUE DATA (If Any) ***
+            byteSize += SIZEOF_NETWORK_ACTIVITY_END;                                    // END Network Activity Stream
+
+            return byteSize;
+        }
+
+        #region Connectivity
+
+        public static int SizeOf (PlayerJoinRequestGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Buy-In Chips
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerLeaveRequestGameInput input) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (input);                                             // Data Signature and Common Data
+
+            return byteSize;
+        }
+
+        #endregion
+
+        #region Player Action
+
         public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CHECK =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
         public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_CALL =
@@ -188,6 +218,8 @@ namespace TCSHoldEmPoker.Network.Data {
             sizeof (Int32);                                                         // New Stake
         public const int SIZEOF_POKER_GAME_INPUT_PLAYER_ACTION_BET_FOLD =
             SIZEOF_POKER_GAME_INPUT_COMMON_DATA;                                    // Input Data Signature and Common Data
+
+        #endregion
 
         #endregion
 
@@ -275,5 +307,8 @@ namespace TCSHoldEmPoker.Network.Data {
             outValue = BitConverter.ToInt16 (bytes, startIndex: currentDataIndex);
             currentDataIndex += sizeof (Int16);
         }
+
+        #endregion
+
     }
 }
