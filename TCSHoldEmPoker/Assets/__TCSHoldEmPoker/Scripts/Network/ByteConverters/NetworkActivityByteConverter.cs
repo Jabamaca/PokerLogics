@@ -24,14 +24,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameStateUpdate (PokerGameStateUpdate stateUpdate) {
-            int dataSize = ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE_BASE;
-            dataSize += stateUpdate.updatedTableStateData.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-            foreach (var sidePrizeData in stateUpdate.updatedTableStateData.sidePrizeStateDataList) {
-                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
-                dataSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER * sidePrizeData.qualifiedPlayerIDs.Count;
-            }
-
-            byte[] returnBytes = new byte[dataSize];
+            byte[] returnBytes = new byte[ByteConverterUtils.SizeOf (stateUpdate)];
 
             int currentDataIndex = 0;
             // Network Activity START Signature

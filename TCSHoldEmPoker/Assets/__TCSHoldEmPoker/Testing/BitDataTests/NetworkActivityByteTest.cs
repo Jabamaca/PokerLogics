@@ -128,12 +128,7 @@ public class NetworkActivityByteTest {
             gameTableID = 7410112,
             updatedTableStateData = tsd1,
         };
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_STATE_UPDATE_BASE;
-        expectedSize += tsd1.mainPrizeStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-        foreach (var sidePrizeData in tsd1.sidePrizeStateDataList) {
-            expectedSize += ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE;
-            expectedSize += sidePrizeData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER;
-        }
+        int expectedSize = ByteConverterUtils.SizeOf (stateUpdate1);
         byte[] updateBytes = NetworkActivityByteConverter.BytesFromPokerGameStateUpdate (stateUpdate1);
         TestNetworkActivityByteArray (updateBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_STATE_UPDATE);

@@ -207,9 +207,11 @@ namespace TCSHoldEmPoker.Network.Data {
                 BytesToPrizePotStateData (bytes, ref currentDataIndex, out var sidePrizePotData);
                 sidePrizePotDataList.Add (sidePrizePotData);
             }
+            // Side Prize Pot Count
+            ByteConverterUtils.BytesToInt16 (bytes, ref currentDataIndex, out var seatCount);
             // Seat State Data Order
             List<SeatStateData> seatStateDataOrder = new ();
-            for (int ssdi = 0; ssdi < HoldEmPokerDefines.POKER_TABLE_CAPACITY; ssdi++) {
+            for (int ssdi = 0; ssdi < seatCount; ssdi++) {
                 BytesToSeatStateData (bytes, ref currentDataIndex, out var seatStateData);
                 seatStateDataOrder.Add (seatStateData);
             }
@@ -257,9 +259,11 @@ namespace TCSHoldEmPoker.Network.Data {
                 ByteConverterUtils.AddBytesToArray (bytesToAdd: BytesFromPrizePotStateData (sidePrizePot),
                     bytesLocation: returnBytes, ref currentDataIndex);
             }
+            // Side Prize Pot Count
+            ByteConverterUtils.AddBytesToArray (bytesToAdd: BitConverter.GetBytes ((Int16)tableStateData.seatStateDataOrder.Count),
+                bytesLocation: returnBytes, ref currentDataIndex);
             // Seat State Data Order
-            for (int s = 0; s < HoldEmPokerDefines.POKER_TABLE_CAPACITY; s++) {
-                var seatStateData = tableStateData.seatStateDataOrder[s];
+            foreach (var seatStateData in tableStateData.seatStateDataOrder) {
                 ByteConverterUtils.AddBytesToArray (bytesToAdd: BytesFromSeatStateData (seatStateData),
                     bytesLocation: returnBytes, ref currentDataIndex);
             }
