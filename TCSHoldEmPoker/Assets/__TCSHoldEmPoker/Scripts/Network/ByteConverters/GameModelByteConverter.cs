@@ -172,8 +172,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPrizePotStateData (PrizePotStateData prizePotStateData) {
-            int dataSize = ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE +
-                (prizePotStateData.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER);
+            int dataSize = ByteConverterUtils.SizeOf (prizePotStateData);
             byte[] returnBytes = new byte[dataSize];
 
             int currentIndex = 0;

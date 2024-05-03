@@ -99,8 +99,7 @@ public class GameModelByteTests {
             }
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_BASE +
-            (ppsd1.qualifiedPlayerIDs.Count * ByteConverterUtils.SIZEOF_PRIZE_POT_STATE_DATA_PLAYER);
+        int expectedSize = ByteConverterUtils.SizeOf (ppsd1);
 
         byte[] ppsdBytes = GameModelByteConverter.BytesFromPrizePotStateData (ppsd1);
         Assert.AreEqual (ppsdBytes.Length, expectedSize);

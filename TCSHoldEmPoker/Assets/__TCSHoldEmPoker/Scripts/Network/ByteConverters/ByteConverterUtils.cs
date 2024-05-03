@@ -40,26 +40,35 @@ namespace TCSHoldEmPoker.Network.Data {
 
         public static int SizeOf (PokerHand pokerHand) {
             int byteSize = 0;
-            byteSize += SizeOf (pokerHand.HandRank);                                // Hand Rank
-            foreach (var card in pokerHand.CardOrder)
-                byteSize += SizeOf (card);                                          // Card Order [ENUMERATE]
+            byteSize += SizeOf (pokerHand.HandRank);                                    // Hand Rank
+            byteSize += SizeOf (PokerCard.BLANK) * HoldEmPokerDefines.POKER_HAND_SIZE;  // 5 Card Order
 
             return byteSize;
         }
 
         public static int SizeOf (PlayerStateData playerStateData) {
             int byteSize = 0;
-            byteSize += sizeof (Int32);                                             // Player ID
-            byteSize += sizeof (Int32);                                             // Chips in Hand
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Chips in Hand
 
             return byteSize;
         }
 
         public static int SizeOf (SeatStateData seatStateData) {
             int byteSize = 0;
-            byteSize += SizeOf (seatStateData.seatedPlayerStateData);               // Seated Player State Data
-            byteSize += sizeof (byte);                                              // BoolSet #1 (didCheck, isPlaying)
-            byteSize += sizeof (Int32);                                             // Current Wager
+            byteSize += SizeOf (seatStateData.seatedPlayerStateData);                   // Seated Player State Data
+            byteSize += sizeof (byte);                                                  // BoolSet #1 (didCheck, isPlaying)
+            byteSize += sizeof (Int32);                                                 // Current Wager
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PrizePotStateData prizePotStateData) {
+            int byteSize = 0;
+            byteSize += sizeof (Int32);                                                 // Prize Amount
+            byteSize += sizeof (Int16);                                                 // Qualified Players Count
+            foreach (var playerID in prizePotStateData.qualifiedPlayerIDs)
+                byteSize += sizeof (Int32);                                             // Qualified Player IDs [ENUMERATE]
 
             return byteSize;
         }
@@ -75,12 +84,6 @@ namespace TCSHoldEmPoker.Network.Data {
             SIZEOF_GAME_PHASE +                                                     // Current Game Phase
             sizeof (Int16) +                                                        // Current Turn Seat Index
             (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_COMMUNITY_CARD_COUNT);     // Community Card Order
-        public const int SIZEOF_PRIZE_POT_STATE_DATA_BASE =
-            sizeof (Int32) +                                                        // Prize Amount
-            sizeof (Int16);                                                         // Qualified Players Count
-            /* (Player Count) * (Player ID) */                                      // Qualified Players Data (Flexible number)
-        public const int SIZEOF_PRIZE_POT_STATE_DATA_PLAYER = 
-            sizeof (Int32);                                                         // Player ID
 
         // Sizes of Game Events
         // COMMON DATA
