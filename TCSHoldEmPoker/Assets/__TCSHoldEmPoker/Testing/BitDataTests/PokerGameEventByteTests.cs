@@ -190,7 +190,7 @@ public class PokerGameEventByteTests {
             wagerPerPlayer = 17000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableUpdateMainPrize (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_UPDATE_MAIN_PRIZE);
@@ -209,7 +209,7 @@ public class PokerGameEventByteTests {
             wagerPerPlayer = 17000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventTableCreateSidePrize (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_TABLE_CREATE_SIDE_PRIZE);
@@ -251,8 +251,7 @@ public class PokerGameEventByteTests {
             revealedHands = revealedHands,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE +
-            (evt1.revealedHands.Count * ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER);
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAllPlayerCardsReveal (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL);
@@ -276,7 +275,7 @@ public class PokerGameEventByteTests {
             chipsWon = 100000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_WIN;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerWin (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_WIN);

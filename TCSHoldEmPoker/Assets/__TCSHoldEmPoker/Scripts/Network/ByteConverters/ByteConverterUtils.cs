@@ -183,23 +183,43 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Win Condition
 
-        public const int SIZEOF_POKER_GAME_EVENT_TABLE_UPDATE_MAIN_POT =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // Updated Prize Total
-        public const int SIZEOF_POKER_GAME_EVENT_TABLE_CREATE_SIDE_POT =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // Side Pot Prize Total
-        public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_BASE =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int16);                                                         // Participating Players Count
-            /* (Player Count) * (Player ID + Cards Data) */                         // Participating Players Data (Flexible number)
-        public const int SIZEOF_POKER_GAME_EVENT_ALL_PLAYER_CARDS_REVEAL_PLAYER =
-            sizeof (Int32) +                                                        // Player ID
-            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT);        // Cards Data
-        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_WIN =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Chips Won
+        public static int SizeOf (UpdateMainPrizePotGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Wager per Player
+
+            return byteSize;
+        }
+
+        public static int SizeOf (CreateSidePrizePotGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Wager per Player
+
+            return byteSize;
+        }
+
+        public static int SizeOf (AllPlayerCardsRevealGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int16);                                                 // Participating Players Count
+            foreach (var handKVP in evt.revealedHands) {
+                byteSize += sizeof (Int32);                                             // Participating Player ID [ENUMERATE]
+                byteSize += 
+                    SizeOf (PokerCard.BLANK) * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT; // Participating Player Dealt Cards [ENUMERATE]
+            }
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerWinGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Prize Won
+
+            return byteSize;
+        }
 
         #endregion
 
