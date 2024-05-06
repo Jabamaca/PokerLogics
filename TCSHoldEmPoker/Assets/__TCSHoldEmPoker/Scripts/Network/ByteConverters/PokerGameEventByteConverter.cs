@@ -321,7 +321,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetBlind (PlayerBetBlindGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_BLIND;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
@@ -350,7 +350,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetCheck (PlayerBetCheckGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CHECK;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
@@ -393,7 +393,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetCall (PlayerBetCallGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CALL;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
@@ -438,7 +438,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetRaise (PlayerBetRaiseGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_RAISE;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();
@@ -467,7 +467,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventPlayerBetFold (PlayerFoldGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_FOLD;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();

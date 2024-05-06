@@ -192,24 +192,48 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Player Action
 
-        public const int SIZEOF_POKER_GAME_EVENT_BET_BLIND =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Chips Spent
-        public const int SIZEOF_POKER_GAME_EVENT_BET_CALL =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Chips Spent
-        public const int SIZEOF_POKER_GAME_EVENT_BET_CHECK =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // Player ID
-        public const int SIZEOF_POKER_GAME_EVENT_BET_RAISE =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            sizeof (Int32);                                                         // Chips Spent
-        public const int SIZEOF_POKER_GAME_EVENT_BET_FOLD =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32);                                                         // Player ID
+        public static int SizeOf (PlayerBetBlindGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Chips Spent
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetCallGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Chips Spent
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetCheckGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerBetRaiseGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += sizeof (Int32);                                                 // Chips Spent
+
+            return byteSize;
+        }
+
+        public static int SizeOf (PlayerFoldGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+
+            return byteSize;
+        }
 
         #endregion
 

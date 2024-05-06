@@ -296,7 +296,7 @@ public class PokerGameEventByteTests {
             chipsSpent = 1000,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_BLIND;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetBlind (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_BLIND);
@@ -316,7 +316,7 @@ public class PokerGameEventByteTests {
             playerID = 456,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CHECK;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCheck (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CHECK);
@@ -335,7 +335,7 @@ public class PokerGameEventByteTests {
             playerID = 3256,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_FOLD;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetFold (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_FOLD);
@@ -356,7 +356,7 @@ public class PokerGameEventByteTests {
             isAllIn = false,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CALL;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCall (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_BASIC);
@@ -379,7 +379,7 @@ public class PokerGameEventByteTests {
             isAllIn = true,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_CALL;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetCall (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_CALL_ALL_IN);
@@ -402,7 +402,7 @@ public class PokerGameEventByteTests {
             isAllIn = false,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_RAISE;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetRaise (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_BASIC);
@@ -425,7 +425,7 @@ public class PokerGameEventByteTests {
             isAllIn = true,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_BET_RAISE;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerBetRaise (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_BET_RAISE_ALL_IN);
