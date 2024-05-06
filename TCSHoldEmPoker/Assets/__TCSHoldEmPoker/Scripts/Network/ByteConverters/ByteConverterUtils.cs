@@ -136,14 +136,29 @@ namespace TCSHoldEmPoker.Network.Data {
 
         #region Game Progression
 
-        public const int SIZEOF_POKER_GAME_EVENT_ANTE_START =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
-        public const int SIZEOF_POKER_GAME_EVENT_ANTE_PHASE_CHANGE =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            SIZEOF_GAME_PHASE;                                                      // Ante Game Phase
-        public const int SIZEOF_POKER_GAME_EVENT_ANTE_TURN_CHANGE =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int16);                                                         // New Seat Index
+        public static int SizeOf (AnteStartGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+
+            return byteSize;
+        }
+
+        public static int SizeOf (GamePhaseChangeGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += SizeOf (PokerGamePhaseEnum.SAMPLE);                             // New Ante Game Phase
+
+            return byteSize;
+        }
+
+        public static int SizeOf (ChangeTurnSeatIndexGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int16);                                                 // Turning Seat Index
+
+            return byteSize;
+        }
+
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_END =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
         // Card Dealing
