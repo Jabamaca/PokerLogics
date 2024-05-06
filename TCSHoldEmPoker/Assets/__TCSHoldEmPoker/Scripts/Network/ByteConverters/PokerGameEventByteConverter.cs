@@ -215,7 +215,7 @@ namespace TCSHoldEmPoker.Network.Data {
         }
 
         public static byte[] BytesFromPokerGameEventAnteEnd (AnteEndGameEvent evt) {
-            int eventSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END;
+            int eventSize = ByteConverterUtils.SizeOf (evt);
             return BytesFromPokerGameEvent (evt, eventSize,
                 uniqueDataProcess: (evt) => {
                     List<byte> uniqueByteList = new ();

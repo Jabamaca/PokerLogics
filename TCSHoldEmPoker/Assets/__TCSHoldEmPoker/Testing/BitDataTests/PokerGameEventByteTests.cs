@@ -172,7 +172,7 @@ public class PokerGameEventByteTests {
             gameTableID = 4859205,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_ANTE_END;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventAnteEnd (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_ANTE_END);

@@ -159,9 +159,19 @@ namespace TCSHoldEmPoker.Network.Data {
             return byteSize;
         }
 
+        public static int SizeOf (AnteEndGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+
+            return byteSize;
+        }
         public const int SIZEOF_POKER_GAME_EVENT_ANTE_END =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
-        // Card Dealing
+
+        #endregion
+
+        #region Card Dealing
+
         public const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
             SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
             sizeof (Int32) +                                                        // Player ID
