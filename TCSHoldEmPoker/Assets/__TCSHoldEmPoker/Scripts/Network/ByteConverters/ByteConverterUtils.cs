@@ -165,21 +165,28 @@ namespace TCSHoldEmPoker.Network.Data {
 
             return byteSize;
         }
-        public const int SIZEOF_POKER_GAME_EVENT_ANTE_END =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA;                                    // Event Data Signature and Common Data
 
         #endregion
 
         #region Card Dealing
 
-        public const int SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            sizeof (Int32) +                                                        // Player ID
-            (SIZEOF_CARD_DATA * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT);        // Cards Data
-        public const int SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL =
-            SIZEOF_POKER_GAME_EVENT_COMMON_DATA +                                   // Event Data Signature and Common Data
-            SIZEOF_CARD_DATA +                                                      // Card Data
-            sizeof (Int16);                                                         // Card Position (Flop 1-2-3, Turn, River)
+        public static int SizeOf (PlayerCardsDealGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+            byteSize += SizeOf (PokerCard.BLANK) * HoldEmPokerDefines.POKER_PLAYER_DEAL_COUNT;  // Cards Data
+
+            return byteSize;
+        }
+
+        public static int SizeOf (CommunityCardDealGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += SizeOf (PokerCard.BLANK);                                       // Card Data
+            byteSize += sizeof (Int16);                                                 // Card Position (Flop 1-2-3, Turn, River)
+
+            return byteSize;
+        }
 
         #endregion
 

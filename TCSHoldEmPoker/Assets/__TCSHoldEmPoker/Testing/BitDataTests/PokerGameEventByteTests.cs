@@ -78,7 +78,7 @@ public class PokerGameEventByteTests {
             cards = cards,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_PLAYER_CARD_DEAL;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerCardDeal (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_CARD_DEAL);
@@ -99,7 +99,7 @@ public class PokerGameEventByteTests {
             cardIndex = 2,
         };
 
-        int expectedSize = ByteConverterUtils.SIZEOF_POKER_GAME_EVENT_COMMUNITY_CARD_DEAL;
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
         byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventCommunityCardDeal (evt1);
         TestPokerGameEventByteArray (evtBytes, expectedSize,
             expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_COMMUNITY_CARD_DEAL);
