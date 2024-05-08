@@ -71,6 +71,13 @@ namespace TCSHoldEmPoker.Models {
             }
         }
 
+        public void PlayerGetKicked (int playerID) {
+            if (FindSeatWithPlayerID (playerID, out var seat)) {
+                seat.UnseatPlayer ();
+                seat.SurrenderCards ();
+            }
+        }
+
         #endregion
 
         #region Game Phase Methods

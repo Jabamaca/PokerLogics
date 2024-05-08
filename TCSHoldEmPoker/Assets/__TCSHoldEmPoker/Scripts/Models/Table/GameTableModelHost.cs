@@ -7,6 +7,7 @@ namespace TCSHoldEmPoker.Models {
     // Connectivity Delegates
     public delegate void DidPlayerJoinHandler (int gameTableID, int playerID, int buyInChips);
     public delegate void DidPlayerLeaveHandler (int gameTableID, int playerID, int redeemedChips);
+    public delegate void DidPlayerGetKickedHandler (int gameTableID, int playerID, int redeemedChips);
 
     // Game Progression Delegates
     public delegate void DidAnteStartHandler (int gameTableID);
@@ -40,6 +41,7 @@ namespace TCSHoldEmPoker.Models {
         // Connectivity Delegates
         public DidPlayerJoinHandler DidPlayerJoin = delegate { };
         public DidPlayerLeaveHandler DidPlayerLeave = delegate { };
+        public DidPlayerGetKickedHandler DidPlayerGetKicked = delegate { };
 
         // Game Progression Delegates
         public DidAnteStartHandler DidAnteStart = delegate { };
@@ -426,8 +428,10 @@ namespace TCSHoldEmPoker.Models {
         private void KickPlayersWithNoChips () {
             foreach (var seat in _playerSeats) {
                 if (!seat.IsSeatEmpty && seat.SeatedPlayerChips <= 0) {
+                    int kickedPlayerID = seat.SeatedPlayerID;
+                    int remainingChips = seat.SeatedPlayerChips;
                     seat.UnseatPlayer ();
-                    // TODO: To Edit Jaba Kicked Player Game Event
+                    DidPlayerGetKicked (_gameTableID, kickedPlayerID, remainingChips);
                 }
             }
         }

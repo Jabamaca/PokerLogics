@@ -113,6 +113,11 @@ namespace TCSHoldEmPoker.Network.Data {
                     GlobalObserver.NotifyObservers (evt);
                     return;
                 }
+                case NetworkActivityID.POKER_GAME_EVENT_PLAYER_GET_KICKED: {
+                    PokerGameEventByteConverter.BytesToPokerGameEventPlayerGetKicked (deframedDataBytes, ref currentDataIndex, out var evt);
+                    GlobalObserver.NotifyObservers (evt);
+                    return;
+                }
                 // ANTE PROGRESSION
                 case NetworkActivityID.POKER_GAME_EVENT_ANTE_START: {
                     PokerGameEventByteConverter.BytesToPokerGameEventAnteStart (deframedDataBytes, ref currentDataIndex, out var evt);

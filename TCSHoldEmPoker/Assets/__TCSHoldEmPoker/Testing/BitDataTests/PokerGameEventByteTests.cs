@@ -66,6 +66,25 @@ public class PokerGameEventByteTests {
     }
 
     [Test]
+    public void PokerData_PlayerGetKickedEventConversion_Test () {
+        PlayerGetKickedGameEvent evt1 = new () {
+            gameTableID = 757532,
+            playerID = 1182,
+        };
+
+        int expectedSize = ByteConverterUtils.SizeOf (evt1);
+        byte[] evtBytes = PokerGameEventByteConverter.BytesFromPokerGameEventPlayerGetKicked (evt1);
+        TestPokerGameEventByteArray (evtBytes, expectedSize,
+            expectedNetActID: NetworkActivityID.POKER_GAME_EVENT_PLAYER_GET_KICKED);
+
+        int currentDataIndex = 0;
+        PokerGameEventByteConverter.BytesToPokerGameEventPlayerGetKicked (evtBytes, ref currentDataIndex, out var evt2);
+        Assert.AreEqual (currentDataIndex, expectedSize);
+        TestPokerGameEventCommonData (evt1, evt2);
+        Assert.AreEqual (evt1.playerID, evt2.playerID);
+    }
+
+    [Test]
     public void PokerData_PlayerCardsDealEventConversion_Test () {
         List<PokerCard> cards = new () {
             PokerCard.CARD_X_D,

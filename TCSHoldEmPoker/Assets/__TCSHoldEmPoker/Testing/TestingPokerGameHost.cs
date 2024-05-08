@@ -36,6 +36,7 @@ public class TestingPokerGameHost {
     private void AddTableDelegates () {
         _tableHost.DidPlayerJoin += DidPlayerJoin;
         _tableHost.DidPlayerLeave += DidPlayerLeave;
+        _tableHost.DidPlayerGetKicked += DidPlayerGetKicked;
 
         _tableHost.DidAnteStart += DidAnteStart;
         _tableHost.DidGamePhaseChange += DidGamePhaseChange;
@@ -62,6 +63,7 @@ public class TestingPokerGameHost {
     private void RemoveTableDelegates () {
         _tableHost.DidPlayerJoin -= DidPlayerJoin;
         _tableHost.DidPlayerLeave -= DidPlayerLeave;
+        _tableHost.DidPlayerGetKicked -= DidPlayerGetKicked;
 
         _tableHost.DidAnteStart -= DidAnteStart;
         _tableHost.DidGamePhaseChange -= DidGamePhaseChange;
@@ -97,6 +99,10 @@ public class TestingPokerGameHost {
 
     private void DidPlayerLeave (int gameTableID, int playerID, int redeemedChips) {
         Debug.Log (gameTableID + " PLAYER_LEAVE PlayerID:" + playerID + " Chips:" + redeemedChips);
+    }
+
+    private void DidPlayerGetKicked (int gameTableID, int playerID, int redeemedChips) {
+        Debug.Log (gameTableID + " PLAYER_KICKED PlayerID:" + playerID + " Chips:" + redeemedChips);
     }
 
     #endregion

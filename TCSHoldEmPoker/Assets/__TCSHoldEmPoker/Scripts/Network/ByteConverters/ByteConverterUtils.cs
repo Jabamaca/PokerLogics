@@ -132,6 +132,14 @@ namespace TCSHoldEmPoker.Network.Data {
             return byteSize;
         }
 
+        public static int SizeOf (PlayerGetKickedGameEvent evt) {
+            int byteSize = 0;
+            byteSize += BaseSizeOf (evt);                                               // Data Signature and Common Data
+            byteSize += sizeof (Int32);                                                 // Player ID
+
+            return byteSize;
+        }
+
         #endregion
 
         #region Game Progression

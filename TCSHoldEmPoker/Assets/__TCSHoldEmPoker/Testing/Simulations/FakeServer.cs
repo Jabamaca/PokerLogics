@@ -36,6 +36,7 @@ public class FakeServer : MonoBehaviour {
     private void AddCoordinatorDelegates () {
         _gameCoordinator.DidPlayerJoin += DidPlayerJoin;
         _gameCoordinator.DidPlayerLeave += DidPlayerLeave;
+        _gameCoordinator.DidPlayerGetKicked += DidPlayerGetKicked;
 
         _gameCoordinator.DidAnteStart += DidAnteStart;
         _gameCoordinator.DidGamePhaseChange += DidGamePhaseChange;
@@ -62,6 +63,7 @@ public class FakeServer : MonoBehaviour {
     private void RemoveCoordinatorDelegates () {
         _gameCoordinator.DidPlayerJoin -= DidPlayerJoin;
         _gameCoordinator.DidPlayerLeave -= DidPlayerLeave;
+        _gameCoordinator.DidPlayerGetKicked -= DidPlayerGetKicked;
 
         _gameCoordinator.DidAnteStart -= DidAnteStart;
         _gameCoordinator.DidGamePhaseChange -= DidGamePhaseChange;
@@ -101,6 +103,13 @@ public class FakeServer : MonoBehaviour {
 
     private void DidPlayerLeave (int gameTableID, int playerID, int redeemedChips) {
         GlobalObserver.NotifyObservers (new PlayerLeaveGameEvent () {
+            gameTableID = gameTableID,
+            playerID = playerID,
+        });
+    }
+
+    private void DidPlayerGetKicked (int gameTableID, int playerID, int redeemedChips) {
+        GlobalObserver.NotifyObservers (new PlayerGetKickedGameEvent () {
             gameTableID = gameTableID,
             playerID = playerID,
         });

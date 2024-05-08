@@ -11,6 +11,7 @@ namespace TCSHoldEmPoker.Network {
         // Connectivity Delegates
         public DidPlayerJoinHandler DidPlayerJoin = delegate { };
         public DidPlayerLeaveHandler DidPlayerLeave = delegate { };
+        public DidPlayerGetKickedHandler DidPlayerGetKicked = delegate { };
 
         // Game Progression Delegates
         public DidAnteStartHandler DidAnteStart = delegate { };
@@ -84,6 +85,7 @@ namespace TCSHoldEmPoker.Network {
         private void AddDelegationToGameTable (GameTableModelHost gameTable) {
             gameTable.DidPlayerJoin += DidPlayerJoin;
             gameTable.DidPlayerLeave += DidPlayerLeave;
+            gameTable.DidPlayerGetKicked += DidPlayerGetKicked;
 
             gameTable.DidAnteStart += DidAnteStart;
             gameTable.DidGamePhaseChange += DidGamePhaseChange;
@@ -110,6 +112,7 @@ namespace TCSHoldEmPoker.Network {
         private void RemoveDelegationFromGameTable (GameTableModelHost gameTable) {
             gameTable.DidPlayerJoin -= DidPlayerJoin;
             gameTable.DidPlayerLeave -= DidPlayerLeave;
+            gameTable.DidPlayerGetKicked -= DidPlayerGetKicked;
 
             gameTable.DidAnteStart -= DidAnteStart;
             gameTable.DidGamePhaseChange -= DidGamePhaseChange;

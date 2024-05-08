@@ -13,6 +13,7 @@ namespace TCSHoldEmPoker.Network.Define {
         // Connectivity
         POKER_GAME_EVENT_PLAYER_JOIN                    = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_JOIN,
         POKER_GAME_EVENT_PLAYER_LEAVE                   = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_LEAVE,
+        POKER_GAME_EVENT_PLAYER_GET_KICKED              = POKER_GAME_EVENT_PREFIX | PokerGameEventType.PLAYER_GET_KICKED,
         // Ante Progression
         POKER_GAME_EVENT_ANTE_START                     = POKER_GAME_EVENT_PREFIX | PokerGameEventType.ANTE_START,
         POKER_GAME_EVENT_ANTE_PHASE_CHANGE              = POKER_GAME_EVENT_PREFIX | PokerGameEventType.ANTE_PHASE_CHANGE,

@@ -120,6 +120,33 @@ namespace TCSHoldEmPoker.Network.Data {
                 });
         }
 
+        // PLAYER GET KICKED
+
+        public static void BytesToPokerGameEventPlayerGetKicked (byte[] bytes, ref int currentDataIndex, out PlayerGetKickedGameEvent evt) {
+            BytesToPokerGameEvent (bytes, ref currentDataIndex, PokerGameEventPlayerGetKickedUniqueDataProcess, out evt);
+        }
+
+        private static void PokerGameEventPlayerGetKickedUniqueDataProcess (byte[] bytes, ref int currentDataIndex, out PlayerGetKickedGameEvent evt) {
+            // Player ID
+            ByteConverterUtils.BytesToInt32 (bytes, ref currentDataIndex, out var playerID);
+
+            evt = new () {
+                playerID = playerID,
+            };
+        }
+
+        public static byte[] BytesFromPokerGameEventPlayerGetKicked (PlayerGetKickedGameEvent evt) {
+            int eventSize = ByteConverterUtils.SizeOf (evt);
+            return BytesFromPokerGameEvent (evt, eventSize,
+                uniqueDataProcess: (evt) => {
+                    List<byte> uniqueByteList = new ();
+                    // Player ID
+                    uniqueByteList.AddRange (BitConverter.GetBytes (evt.playerID));
+
+                    return uniqueByteList;
+                });
+        }
+
         #endregion
 
         #region Ante Progression Game Events Conversion
